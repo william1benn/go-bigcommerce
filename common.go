@@ -4,3 +4,5 @@ type CustomURL struct {
 	URL          string `json:"url"`
 	IsCustomized bool   `json:"is_customized"`
 }
+
+type MetaData struct{}

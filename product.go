@@ -1,38 +1,38 @@
 package bigcommerce
 
 type Product struct {
-	ID                      int       `json:"id"`
+	ID                      float64   `json:"id"`
 	Name                    string    `json:"name"`
 	Type                    string    `json:"type"`
 	SKU                     string    `json:"sku"`
 	Description             string    `json:"description"`
-	Weight                  int       `json:"weight"`
-	Width                   int       `json:"width"`
-	Depth                   int       `json:"depth"`
-	Height                  int       `json:"height"`
+	Weight                  float64   `json:"weight"`
+	Width                   float64   `json:"width"`
+	Depth                   float64   `json:"depth"`
+	Height                  float64   `json:"height"`
 	Price                   float64   `json:"price"`
-	CostPrice               int       `json:"cost_price"`
-	RetailPrice             int       `json:"retail_price"`
-	SalePrice               int       `json:"sale_price"`
-	MapPrice                int       `json:"map_price"`
-	TaxClassID              int       `json:"tax_class_id"`
+	CostPrice               float64   `json:"cost_price"`
+	RetailPrice             float64   `json:"retail_price"`
+	SalePrice               float64   `json:"sale_price"`
+	MapPrice                float64   `json:"map_price"`
+	TaxClassID              float64   `json:"tax_class_id"`
 	ProductTaxCode          string    `json:"product_tax_code"`
 	CalculatedPrice         float64   `json:"calculated_price"`
-	Categories              []int     `json:"categories"`
-	BrandID                 int       `json:"brand_id"`
-	OptionSetID             int       `json:"option_set_id"`
+	Categories              []float64 `json:"categories"`
+	BrandID                 float64   `json:"brand_id"`
+	OptionSetID             float64   `json:"option_set_id"`
 	OptionSetDisplay        string    `json:"option_set_display"`
-	InventoryLevel          int       `json:"inventory_level"`
-	InventoryWarningLevel   int       `json:"inventory_warning_level"`
+	InventoryLevel          float64   `json:"inventory_level"`
+	InventoryWarningLevel   float64   `json:"inventory_warning_level"`
 	InventoryTracking       string    `json:"inventory_tracking"`
-	ReviewsRatingSum        int       `json:"reviews_rating_sum"`
-	ReviewsCount            int       `json:"reviews_count"`
-	TotalSold               int       `json:"total_sold"`
-	FixedCostShippingPrice  int       `json:"fixed_cost_shipping_price"`
+	ReviewsRatingSum        float64   `json:"reviews_rating_sum"`
+	ReviewsCount            float64   `json:"reviews_count"`
+	TotalSold               float64   `json:"total_sold"`
+	FixedCostShippingPrice  float64   `json:"fixed_cost_shipping_price"`
 	IsFreeShipping          bool      `json:"is_free_shipping"`
 	IsVisible               bool      `json:"is_visible"`
 	IsFeatured              bool      `json:"is_featured"`
-	RelatedProducts         []int     `json:"related_products"`
+	RelatedProducts         []float64 `json:"related_products"`
 	Warranty                string    `json:"warranty"`
 	BinPickingNumber        string    `json:"bin_picking_number"`
 	LayoutFile              string    `json:"layout_file"`
@@ -44,24 +44,24 @@ type Product struct {
 	AvailabilityDescription string    `json:"availability_description"`
 	GiftWrappingOptionsType string    `json:"gift_wrapping_options_type"`
 	GiftWrappingOptionsList []string  `json:"gift_wrapping_options_list"`
-	SortOrder               int       `json:"sort_order"`
+	SortOrder               float64   `json:"sort_order"`
 	Condition               string    `json:"condition"`
 	IsConditionShown        bool      `json:"is_condition_shown"`
-	OrderQuantityMinimum    int       `json:"order_quantity_minimum"`
-	OrderQuantityMaximum    int       `json:"order_quantity_maximum"`
+	OrderQuantityMinimum    float64   `json:"order_quantity_minimum"`
+	OrderQuantityMaximum    float64   `json:"order_quantity_maximum"`
 	PageTitle               string    `json:"page_title"`
 	MetaKeywords            []string  `json:"meta_keywords"`
 	MetaDescription         string    `json:"meta_description"`
 	DateCreated             string    `json:"date_created"`
 	DateModified            string    `json:"date_modified"`
-	ViewCount               int       `json:"view_count"`
+	ViewCount               float64   `json:"view_count"`
 	PreorderReleaseDate     string    `json:"preorder_release_date"`
 	PreorderMessage         string    `json:"preorder_message"`
 	IsPreorderOnly          bool      `json:"is_preorder_only"`
 	IsPriceHidden           bool      `json:"is_price_hidden"`
 	PriceHiddenLabel        string    `json:"price_hidden_label"`
 	CustomURL               CustomURL `json:"custom_url"`
-	BaseVariantID           int       `json:"base_variant_id"`
+	BaseVariantID           float64   `json:"base_variant_id"`
 	OpenGraphType           string    `json:"open_graph_type"`
 	OpenGraphTitle          string    `json:"open_graph_title"`
 	OpenGraphDescription    string    `json:"open_graph_description"`

@@ -1,6 +1,6 @@
 package bigcommerce
 
-type BrandData struct {
+type Brand struct {
 	ID              int       `json:"id"`
 	Name            string    `json:"name"`
 	MetaKeywords    []string  `json:"meta_keywords"`
