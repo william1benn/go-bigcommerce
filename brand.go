@@ -1,5 +1,11 @@
 package bigcommerce
 
+import (
+	"encoding/json"
+	"errors"
+	"fmt"
+)
+
 type Brand struct {
 	ID              int       `json:"id"`
 	Name            string    `json:"name"`
@@ -8,4 +14,57 @@ type Brand struct {
 	ImageURL        string    `json:"image_url"`
 	SearchKeywords  string    `json:"search_keywords"`
 	CustomURL       CustomURL `json:"custom_url"`
+}
+
+func (client *Client) getBrand(id int) (Brand, error) {
+	type ResponseObject struct {
+		Data Brand    `json:"data"`
+		Meta MetaData `json:"meta"`
+	}
+
+	var response ResponseObject
+
+	brandURL := client.BaseURL.JoinPath("/catalog/brands", fmt.Sprint(id)).String()
+
+	resp, err := client.Request("GET", brandURL)
+	if err != nil {
+		return response.Data, nil
+	}
+	defer resp.Body.Close()
+
+	err = json.NewDecoder(resp.Body).Decode(&response)
+
+	if err != nil {
+		return response.Data, err
+	}
+
+	return response.Data, nil
+}
+
+func (client *Client) getBrands() ([]Brand, error) {
+	type ResponseObject struct {
+		Data []Brand  `json:"data"`
+		Meta MetaData `json:"meta"`
+	}
+	var response ResponseObject
+
+	brandsURL := client.BaseURL.JoinPath("/catalog/brands").String()
+
+	resp, err := client.Request("GET", brandsURL)
+	if err != nil {
+		return response.Data, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return response.Data, errors.New("API responded with a non 200 status code")
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&response)
+	if err != nil {
+		return response.Data, err
+	}
+
+	return response.Data, nil
+
 }
