@@ -1,9 +1,6 @@
 package bigcommerce
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -27,47 +24,29 @@ func NewClient(version string, storeHash string, authToken string) Client {
 	return client
 }
 
-func (c *Client) getProductById(id int) (Product, error) {
-	var product Product
-
-	type ResponseObject struct {
-		Data Product  `json:"data"`
-		Meta MetaData `json:"meta"`
-	}
-
-	getProductUrl := c.BaseURL.JoinPath("/catalog/products/", fmt.Sprint(id)).String()
-
+func (c *Client) configureRequest(httpMethod string, relativeUrl string) (*http.Request, error) {
 	// Create a GET request
-	req, err := http.NewRequest("GET", getProductUrl, nil)
+	req, err := http.NewRequest(httpMethod, relativeUrl, nil)
 	if err != nil {
-		return product, err
+		return req, err
 	}
-
 	req.Header.Set("x-auth-token", c.AuthToken)
 
-	// Send the request
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return product, err
-	}
-	defer resp.Body.Close()
+	return req, nil
+}
 
-	// Read the response body
-	body, err := ioutil.ReadAll(resp.Body)
+func (c *Client) Request(httpMethod string, relativeUrl string) (*http.Response, error) {
+	var resp *http.Response
+
+	req, err := c.configureRequest(httpMethod, relativeUrl)
 	if err != nil {
-		return product, err
+		return resp, err
 	}
 
-	var response ResponseObject
-
-	// Print the response
-	err = json.Unmarshal(body, &response)
-
+	resp, err = c.httpClient.Do(req)
 	if err != nil {
-		return product, err
+		return resp, err
 	}
 
-	product = response.Data
-
-	return product, nil
+	return resp, nil
 }
