@@ -3,6 +3,7 @@ package bigcommerce
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 )
 
 type Category struct {
@@ -105,4 +106,33 @@ func (client *Client) GetCategories(params CategoryQueryParams) ([]Category, Met
 	}
 
 	return response.Data, response.Meta, nil
+}
+
+func (client *Client) GetAllCategories(limit int) ([]Category, error) {
+	var categories []Category
+	page := 1
+	end := false
+
+	for !end {
+		c, m, err := client.GetCategories(CategoryQueryParams{Limit: limit, Page: page})
+		if err != nil {
+			return categories, err
+		}
+
+		details := m.Pagination
+		log.Printf("Fetched %d categories. Current page: %d", details.Count, details.CurrentPage)
+
+		for i := 0; i < len(c); i++ {
+			categories = append(categories, c[i])
+		}
+
+		if len(c) < limit {
+			end = true
+			break
+		}
+
+		page++
+	}
+
+	return categories, nil
 }
