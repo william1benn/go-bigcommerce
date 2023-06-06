@@ -1,5 +1,71 @@
 package bigcommerce
 
+import (
+	"encoding/json"
+	"fmt"
+)
+
+func (client *Client) GetOrder(orderID int) (Order, error) {
+	type ResponseObject struct {
+		Data Order    `json:"data"`
+		Meta MetaData `json:"meta"`
+	}
+	var response ResponseObject
+
+	if client.Version != "2" {
+		return response.Data, fmt.Errorf("API version 2 is required for this function. You are using version: %s", client.Version)
+	}
+
+	getOrderURL := client.BaseURL.JoinPath("/storefront/orders", fmt.Sprint(orderID)).String()
+
+	resp, err := client.Request("GET", getOrderURL)
+	if err != nil {
+		return response.Data, err
+	}
+	defer resp.Body.Close()
+
+	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+		return response.Data, err
+	}
+
+	return response.Data, nil
+}
+
+func (client *Client) GetOrders(params OrderQueryParams) ([]Order, MetaData, error) {
+	type ResponseData struct {
+		Data []Order  `json:"data"`
+		Meta MetaData `json:"meta"`
+	}
+	var response ResponseData
+
+	if client.Version != "2" {
+		return response.Data, response.Meta, fmt.Errorf("API version 2 is required for this function. You are using version: %s", client.Version)
+	}
+
+	queryParams, err := paramString(params)
+	if err != nil {
+		return response.Data, response.Meta, err
+	}
+
+	getOrdersURL := client.BaseURL.JoinPath("/storefront/orders").String() + queryParams
+
+	resp, err := client.Request("GET", getOrdersURL)
+	if err != nil {
+		return response.Data, response.Meta, err
+	}
+	defer resp.Body.Close()
+
+	if err = expectStatusCode(200, resp); err != nil {
+		return response.Data, response.Meta, err
+	}
+
+	if err = json.NewDecoder(resp.Body).Decode(&response); err != nil {
+		return response.Data, response.Meta, err
+	}
+
+	return response.Data, response.Meta, nil
+}
+
 type Order struct {
 	ID                                      int            `json:"id"`
 	CustomerID                              int            `json:"customer_id"`
