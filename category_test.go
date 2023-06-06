@@ -4,7 +4,7 @@ import "testing"
 
 func TestGetCategory(t *testing.T) {
 
-	fs := getClient()
+	fs, _ := getClient()
 
 	categoryId := 11
 
@@ -21,9 +21,9 @@ func TestGetCategory(t *testing.T) {
 }
 
 func TestGetCategories(t *testing.T) {
-	fs := getClient()
+	fs, _ := getClient()
 
-	categories, err := fs.GetCategories()
+	categories, _, err := fs.GetCategories()
 
 	if err != nil {
 		t.Error(err)

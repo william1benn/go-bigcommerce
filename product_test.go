@@ -27,7 +27,7 @@ func TestGetProductById(t *testing.T) {
 
 	productId := 193
 
-	product, err := fs.getProduct(productId)
+	product, err := fs.GetProduct(productId)
 
 	if err != nil {
 		t.Error(err)
@@ -41,8 +41,13 @@ func TestGetProductById(t *testing.T) {
 func TestGetAllProducts(t *testing.T) {
 	fs, _ := getClient()
 
-	products, err := fs.GetAllProducts()
+	products, _, err := fs.GetAllProducts()
 	if err != nil {
 		t.Error(err)
 	}
+
+	if len(products) < 1 {
+		t.Error("no products")
+	}
+
 }

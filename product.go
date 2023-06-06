@@ -76,8 +76,7 @@ type Product struct {
 	OpenGraphUseImage       bool      `json:"open_graph_use_image"`
 }
 
-func (client *Client) getProduct(id int) (Product, error) {
-	var product Product
+func (client *Client) GetProduct(id int) (Product, error) {
 
 	type ResponseObject struct {
 		Data Product  `json:"data"`
@@ -90,12 +89,12 @@ func (client *Client) getProduct(id int) (Product, error) {
 	// Send the request
 	resp, err := client.Request("GET", getProductUrl)
 	if err != nil {
-		return product, err
+		return response.Data, err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return product, errors.New(
+		return response.Data, errors.New(
 			"API responded with a non 200 status code",
 		)
 	}
@@ -103,37 +102,38 @@ func (client *Client) getProduct(id int) (Product, error) {
 	err = json.NewDecoder(resp.Body).Decode(&response)
 	// Read the response body
 	if err != nil {
-		return product, err
+		return response.Data, err
 	}
 
-	product = response.Data
-
-	return product, nil
+	return response.Data, nil
 }
 
-func (client *Client) GetAllProducts() ([]Product, error) {
-	var products []Product
-	getProductsUrl := client.BaseURL.JoinPath("/catalog/products").String()
-
-	resp, err := client.Request("GET", getProductsUrl)
-	if err != nil {
-		return products, err
-	}
-	defer resp.Body.Close()
-
+func (client *Client) GetAllProducts() ([]Product, MetaData, error) {
 	type ResponseObject struct {
 		Data []Product `json:"data"`
 		Meta MetaData  `json:"meta"`
 	}
-	if resp.StatusCode != 200 {
-		return products, errors.New("API responded with a non 200 status code")
-	}
 	var response ResponseObject
+
+	getProductsUrl := client.BaseURL.JoinPath("/catalog/products").String()
+
+	resp, err := client.Request("GET", getProductsUrl)
+	if err != nil {
+		return response.Data, response.Meta, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return response.Data, response.Meta, errors.New("API responded with a non 200 status code")
+	}
+
 	err = json.NewDecoder(resp.Body).Decode(&response)
 
-	products = response.Data
+	if err != nil {
+		return response.Data, response.Meta, err
+	}
 
-	return products, nil
+	return response.Data, response.Meta, nil
 }
 
 type ProductQueryParams struct {

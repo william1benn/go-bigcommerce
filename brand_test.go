@@ -1,28 +1,11 @@
 package bigcommerce
 
 import (
-	"os"
 	"testing"
-
-	"github.com/joho/godotenv"
 )
 
-func getClient() Client {
-	var client Client
-
-	godotenv.Load()
-
-	storeHash := os.Getenv("FS_STOREHASH")
-	xAuthToken := os.Getenv("FS_XAUTHTOKEN")
-
-	client = newClient("3", storeHash, xAuthToken)
-
-	return client
-
-}
-
 func TestGetBrand(t *testing.T) {
-	fs := getClient()
+	fs, _ := getClient()
 
 	brandId := 1
 
@@ -38,11 +21,16 @@ func TestGetBrand(t *testing.T) {
 }
 
 func TestGetBrands(t *testing.T) {
-	fs := getClient()
+	fs, _ := getClient()
 
-	brands, err := fs.GetBrands()
+	brands, _, err := fs.GetBrands()
 
 	if err != nil {
 		t.Error(err)
 	}
+
+	if len(brands) < 1 {
+		t.Error("no brands")
+	}
+
 }

@@ -7,6 +7,7 @@ import (
 )
 
 type Category struct {
+	ID                 int       `json:"id"`
 	ParentID           int       `json:"parent_id"`
 	Name               string    `json:"name"`
 	Description        string    `json:"description"`
@@ -23,7 +24,7 @@ type Category struct {
 	CustomURL          CustomURL `json:"custom_url"`
 }
 
-func (client *Client) getCategory(id int) (Category, error) {
+func (client *Client) GetCategory(id int) (Category, error) {
 	type ResponseObject struct {
 		Data Category `json:"data"`
 		Meta MetaData `json:"meta"`
@@ -44,7 +45,7 @@ func (client *Client) getCategory(id int) (Category, error) {
 		return response.Data, errors.New("API responded with a non 200 statuscode")
 	}
 
-	err := json.NewDecoder(resp.Body).Decode(&response)
+	err = json.NewDecoder(resp.Body).Decode(&response)
 
 	if err != nil {
 		return response.Data, err
@@ -53,7 +54,7 @@ func (client *Client) getCategory(id int) (Category, error) {
 	return response.Data, nil
 }
 
-func (client *Client) getCategories() ([]Category, error) {
+func (client *Client) GetCategories() ([]Category, MetaData, error) {
 	type ResponseObject struct {
 		Data []Category `json:"data"`
 		Meta MetaData   `json:"meta"`
@@ -65,21 +66,21 @@ func (client *Client) getCategories() ([]Category, error) {
 	resp, err := client.Request("GET", categoriesURL)
 
 	if err != nil {
-		return response.Data, err
+		return response.Data, response.Meta, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return response.Data, errors.New("API responded with a non 200 status code")
+		return response.Data, response.Meta, errors.New("API responded with a non 200 status code")
 	}
 
-	err := json.NewDecoder(resp.Body).Decode(&response)
+	err = json.NewDecoder(resp.Body).Decode(&response)
 
 	if err != nil {
-		return response.Data, err
+		return response.Data, response.Meta, err
 	}
 
-	return response.Data, nil
+	return response.Data, response.Meta, nil
 
 }
