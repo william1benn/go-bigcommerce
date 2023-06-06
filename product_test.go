@@ -39,11 +39,16 @@ func TestGetProductById(t *testing.T) {
 }
 
 func TestGetAllProducts(t *testing.T) {
-	fs, _ := getClient()
+	fs, err := getClient()
 
-	products, _, err := fs.GetAllProducts()
+	if err != nil {
+		t.Error("error getting client")
+	}
+
+	products, _, err := fs.GetAllProducts(ProductQueryParams{})
 	if err != nil {
 		t.Error(err)
+		return
 	}
 
 	if len(products) < 1 {

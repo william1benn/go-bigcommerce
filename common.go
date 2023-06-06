@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/google/go-querystring/query"
 )
 
 type CustomURL struct {
@@ -54,4 +56,16 @@ func expectStatusCode(expectedStatusCode int, response *http.Response) error {
 		)
 	}
 	return nil
+}
+
+func paramString(params interface{}) (string, error) {
+	queryParamValues, err := query.Values(params)
+	if err != nil {
+		return "", err
+	}
+	var queryParams string = queryParamValues.Encode()
+	if len(queryParams) > 0 {
+		queryParams = "?" + queryParams
+	}
+	return queryParams, nil
 }

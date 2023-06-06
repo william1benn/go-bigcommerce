@@ -5,6 +5,65 @@ import (
 	"fmt"
 )
 
+func (client *Client) GetProduct(id int) (Product, error) {
+	type ResponseObject struct {
+		Data Product  `json:"data"`
+		Meta MetaData `json:"meta"`
+	}
+	var response ResponseObject
+
+	getProductUrl := client.BaseURL.JoinPath("/catalog/products/", fmt.Sprint(id)).String()
+
+	// Send the request
+	resp, err := client.Request("GET", getProductUrl)
+	if err != nil {
+		return response.Data, err
+	}
+	defer resp.Body.Close()
+
+	if err = expectStatusCode(200, resp); err != nil {
+		return response.Data, err
+	}
+
+	if err = json.NewDecoder(resp.Body).Decode(&response); err != nil {
+		return response.Data, err
+	}
+
+	return response.Data, nil
+}
+
+func (client *Client) GetAllProducts(params ProductQueryParams) ([]Product, MetaData, error) {
+	type ResponseObject struct {
+		Data []Product `json:"data"`
+		Meta MetaData  `json:"meta"`
+	}
+	var response ResponseObject
+
+	queryParams, err := paramString(params)
+
+	if err != nil {
+		return response.Data, response.Meta, err
+	}
+
+	getProductsUrl := client.BaseURL.JoinPath("/catalog/products").String() + queryParams
+
+	resp, err := client.Request("GET", getProductsUrl)
+	if err != nil {
+		return response.Data, response.Meta, err
+	}
+	defer resp.Body.Close()
+
+	if err = expectStatusCode(200, resp); err != nil {
+		return response.Data, response.Meta, err
+	}
+
+	if err = json.NewDecoder(resp.Body).Decode(&response); err != nil {
+		return response.Data, response.Meta, err
+	}
+
+	return response.Data, response.Meta, nil
+}
+
 type Product struct {
 	ID                      int       `json:"id"`
 	Name                    string    `json:"name"`
@@ -75,59 +134,6 @@ type Product struct {
 	OpenGraphUseImage       bool      `json:"open_graph_use_image"`
 }
 
-func (client *Client) GetProduct(id int) (Product, error) {
-	type ResponseObject struct {
-		Data Product  `json:"data"`
-		Meta MetaData `json:"meta"`
-	}
-	var response ResponseObject
-
-	getProductUrl := client.BaseURL.JoinPath("/catalog/products/", fmt.Sprint(id)).String()
-
-	// Send the request
-	resp, err := client.Request("GET", getProductUrl)
-	if err != nil {
-		return response.Data, err
-	}
-	defer resp.Body.Close()
-
-	if err = expectStatusCode(200, resp); err != nil {
-		return response.Data, err
-	}
-
-	if err = json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		return response.Data, err
-	}
-
-	return response.Data, nil
-}
-
-func (client *Client) GetAllProducts() ([]Product, MetaData, error) {
-	type ResponseObject struct {
-		Data []Product `json:"data"`
-		Meta MetaData  `json:"meta"`
-	}
-	var response ResponseObject
-
-	getProductsUrl := client.BaseURL.JoinPath("/catalog/products").String()
-
-	resp, err := client.Request("GET", getProductsUrl)
-	if err != nil {
-		return response.Data, response.Meta, err
-	}
-	defer resp.Body.Close()
-
-	if err = expectStatusCode(200, resp); err != nil {
-		return response.Data, response.Meta, err
-	}
-
-	if err = json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		return response.Data, response.Meta, err
-	}
-
-	return response.Data, response.Meta, nil
-}
-
 type ProductQueryParams struct {
 	ID                    int      `url:"id,omitempty"`
 	IDIn                  []int    `url:"id:in,omitempty,comma"`
@@ -177,4 +183,113 @@ type ProductQueryParams struct {
 	CategoriesIn          []int    `url:"categories:in,omitempty,comma"`
 	SKU                   string   `url:"sku,omitempty"`
 	SKUIn                 []string `url:"sku:in,omitempty,comma"`
+}
+
+type UpdateProductParams struct {
+	Name                    string                   `json:"name,omitempty" validate:"required,min=1,max=250"`
+	Type                    string                   `json:"type,omitempty" validate:"required,oneof=physical digital"`
+	SKU                     string                   `json:"sku,omitempty" validate:"max=255"`
+	Description             string                   `json:"description,omitempty"`
+	Weight                  float64                  `json:"weight,omitempty" validate:"required"`
+	Width                   float64                  `json:"width,omitempty"`
+	Depth                   float64                  `json:"depth,omitempty"`
+	Height                  float64                  `json:"height,omitempty"`
+	Price                   float64                  `json:"price,omitempty" validate:"required"`
+	CostPrice               float64                  `json:"cost_price,omitempty"`
+	RetailPrice             float64                  `json:"retail_price,omitempty"`
+	SalePrice               float64                  `json:"sale_price,omitempty"`
+	MapPrice                float64                  `json:"map_price,omitempty"`
+	TaxClassID              int                      `json:"tax_class_id,omitempty"`
+	ProductTaxCode          string                   `json:"product_tax_code,omitempty" validate:"max=255"`
+	Categories              []int                    `json:"categories,omitempty"`
+	BrandID                 int                      `json:"brand_id,omitempty"`
+	InventoryLevel          int                      `json:"inventory_level,omitempty"`
+	InventoryWarningLevel   int                      `json:"inventory_warning_level,omitempty"`
+	InventoryTracking       string                   `json:"inventory_tracking,omitempty"`
+	FixedCostShippingPrice  float64                  `json:"fixed_cost_shipping_price,omitempty"`
+	IsFreeShipping          bool                     `json:"is_free_shipping,omitempty"`
+	IsVisible               bool                     `json:"is_visible,omitempty"`
+	IsFeatured              bool                     `json:"is_featured,omitempty"`
+	RelatedProducts         []int                    `json:"related_products,omitempty"`
+	Warranty                string                   `json:"warranty,omitempty"`
+	BinPickingNumber        string                   `json:"bin_picking_number,omitempty"`
+	LayoutFile              string                   `json:"layout_file,omitempty"`
+	UPC                     string                   `json:"upc,omitempty"`
+	SearchKeywords          string                   `json:"search_keywords,omitempty"`
+	AvailabilityDescription string                   `json:"availability_description,omitempty"`
+	Availability            string                   `json:"availability,omitempty"`
+	GiftWrappingOptionsType string                   `json:"gift_wrapping_options_type,omitempty"`
+	GiftWrappingOptionsList []int                    `json:"gift_wrapping_options_list,omitempty"`
+	SortOrder               int                      `json:"sort_order,omitempty"`
+	Condition               string                   `json:"condition,omitempty"`
+	IsConditionShown        bool                     `json:"is_condition_shown,omitempty"`
+	OrderQuantityMinimum    int                      `json:"order_quantity_minimum,omitempty"`
+	OrderQuantityMaximum    int                      `json:"order_quantity_maximum,omitempty"`
+	PageTitle               string                   `json:"page_title,omitempty"`
+	MetaKeywords            []string                 `json:"meta_keywords,omitempty"`
+	MetaDescription         string                   `json:"meta_description,omitempty"`
+	ViewCount               int                      `json:"view_count,omitempty"`
+	PreorderReleaseDate     string                   `json:"preorder_release_date,omitempty"`
+	Message                 string                   `json:"preorder_message,omitempty"`
+	IsPreorderOnly          bool                     `json:"is_preorder_only,omitempty"`
+	IsPriceHidden           bool                     `json:"is_price_hidden,omitempty"`
+	PriceHiddenLabel        string                   `json:"price_hidden_label,omitempty"`
+	CustomURL               CustomURL                `json:"custom_url,omitempty"`
+	OpenGraphType           string                   `json:"open_graph_type,omitempty"`
+	OpenGraphTitle          string                   `json:"open_graph_title,omitempty"`
+	OpenGraphDescription    string                   `json:"open_graph_description,omitempty"`
+	OpenGraphUseMetaDesc    bool                     `json:"open_graph_use_meta_description,omitempty"`
+	OpenGraphUseProductName bool                     `json:"open_graph_use_product_name,omitempty"`
+	OpenGraphUseImage       bool                     `json:"open_graph_use_image,omitempty"`
+	BrandName               string                   `json:"brand_name,omitempty"`
+	GTIN                    string                   `json:"gtin,omitempty"`
+	MPN                     string                   `json:"mpn,omitempty"`
+	ReviewsRatingSum        int                      `json:"reviews_rating_sum,omitempty"`
+	ReviewsCount            int                      `json:"reviews_count,omitempty"`
+	TotalSold               int                      `json:"total_sold,omitempty"`
+	CustomFields            []ProductCustomField     `json:"custom_fields,omitempty"`
+	BulkPricingRules        []ProductBulkPricingRule `json:"bulk_pricing_rules,omitempty"`
+	Images                  []ProductImage           `json:"images,omitempty"`
+	Videos                  []ProductVideo           `json:"videos,omitempty"`
+	Variants                []ProductVariant         `json:"variants,omitempty"`
+}
+
+type ProductVideo struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	SortOrder   int    `json:"sort_order"`
+	Type        string `json:"type"`
+	VideoID     string `json:"video_id"`
+	ID          int    `json:"id"`
+	ProductID   int    `json:"product_id"`
+	Length      string `json:"length"`
+}
+
+type ProductImage struct {
+	ImageFile    string `json:"image_file"`
+	IsThumbnail  bool   `json:"is_thumbnail"`
+	SortOrder    int    `json:"sort_order"`
+	Description  string `json:"description"`
+	ImageURL     string `json:"image_url"`
+	ID           int    `json:"id"`
+	ProductID    int    `json:"product_id"`
+	URLZoom      string `json:"url_zoom"`
+	URLStandard  string `json:"url_standard"`
+	URLThumbnail string `json:"url_thumbnail"`
+	URLTiny      string `json:"url_tiny"`
+	DateModified string `json:"date_modified"`
+}
+
+type ProductBulkPricingRule struct {
+	ID          int    `json:"id"`
+	QuantityMin int    `json:"quantity_min"`
+	QuantityMax int    `json:"quantity_max"`
+	Type        string `json:"type"`
+	Amount      string `json:"amount"`
+}
+
+type ProductCustomField struct {
+	ID    int    `json:"id"`
+	Name  string `json:"name"`
+	Value string `json:"value"`
 }

@@ -15,6 +15,22 @@ type Brand struct {
 	CustomURL       CustomURL `json:"custom_url"`
 }
 
+type BrandQueryParams struct {
+	ID            int    `url:"id,omitempty"`
+	IDIn          []int  `url:"id:in,omitempty"`
+	IDNotIn       []int  `url:"id:not_in,omitempty"`
+	IDMin         []int  `url:"id:min,omitempty"`
+	IDMax         []int  `url:"id:max,omitempty"`
+	IDGreater     []int  `url:"id:greater,omitempty"`
+	IDLess        []int  `url:"id:less,omitempty"`
+	Name          string `url:"name,omitempty"`
+	PageTitle     string `url:"page_title,omitempty"`
+	Page          int    `url:"page,omitempty"`
+	Limit         int    `url:"limit,omitempty"`
+	IncludeFields string `url:"include_fields,omitempty"`
+	ExcludeFields string `url:"exclude_fields,omitempty"`
+}
+
 func (client *Client) GetBrand(id int) (Brand, error) {
 	type ResponseObject struct {
 		Data Brand    `json:"data"`
@@ -42,14 +58,20 @@ func (client *Client) GetBrand(id int) (Brand, error) {
 	return response.Data, nil
 }
 
-func (client *Client) GetBrands() ([]Brand, MetaData, error) {
+func (client *Client) GetBrands(params BrandQueryParams) ([]Brand, MetaData, error) {
 	type ResponseObject struct {
 		Data []Brand  `json:"data"`
 		Meta MetaData `json:"meta"`
 	}
 	var response ResponseObject
 
-	brandsURL := client.BaseURL.JoinPath("/catalog/brands").String()
+	queryParams, err := paramString(params)
+
+	if err != nil {
+		return response.Data, response.Meta, err
+	}
+
+	brandsURL := client.BaseURL.JoinPath("/catalog/brands").String() + queryParams
 
 	resp, err := client.Request("GET", brandsURL)
 	if err != nil {

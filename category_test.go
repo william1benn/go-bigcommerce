@@ -32,7 +32,7 @@ func TestGetCategory(t *testing.T) {
 func TestGetCategories(t *testing.T) {
 	fs, _ := getClient()
 
-	categories, _, err := fs.GetCategories()
+	categories, _, err := fs.GetCategories(CategoryQueryParams{})
 
 	if err != nil {
 		t.Error(err)

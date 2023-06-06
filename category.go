@@ -23,6 +23,32 @@ type Category struct {
 	CustomURL          CustomURL `json:"custom_url"`
 }
 
+type CategoryQueryParams struct {
+	ID              int      `url:"id,omitempty"`
+	IDIn            []int    `url:"id:in,omitempty"`
+	IDNotIn         []int    `url:"id:not_in,omitempty"`
+	IDMin           []int    `url:"id:min,omitempty"`
+	IDMax           []int    `url:"id:max,omitempty"`
+	IDGreater       []int    `url:"id:greater,omitempty"`
+	IDLess          []int    `url:"id:less,omitempty"`
+	Name            string   `url:"name,omitempty"`
+	NameLike        []string `url:"name:like,omitempty"`
+	ParentID        int      `url:"parent_id,omitempty"`
+	ParentIDIn      []int    `url:"parent_id:in,omitempty"`
+	ParentIDMin     []int    `url:"parent_id:min,omitempty"`
+	ParentIDMax     []int    `url:"parent_id:max,omitempty"`
+	ParentIDGreater []int    `url:"parent_id:greater,omitempty"`
+	ParentIDLess    []int    `url:"parent_id:less,omitempty"`
+	PageTitle       string   `url:"page_title,omitempty"`
+	PageTitleLike   []string `url:"page_title:like,omitempty"`
+	Keyword         string   `url:"keyword,omitempty"`
+	IsVisible       bool     `url:"is_visible,omitempty"`
+	Page            int      `url:"page,omitempty"`
+	Limit           int      `url:"limit,omitempty"`
+	IncludeFields   string   `url:"include_fields,omitempty"`
+	ExcludeFields   string   `url:"exclude_fields,omitempty"`
+}
+
 func (client *Client) GetCategory(id int) (Category, error) {
 	type ResponseObject struct {
 		Data Category `json:"data"`
@@ -49,14 +75,20 @@ func (client *Client) GetCategory(id int) (Category, error) {
 	return response.Data, nil
 }
 
-func (client *Client) GetCategories() ([]Category, MetaData, error) {
+func (client *Client) GetCategories(params CategoryQueryParams) ([]Category, MetaData, error) {
 	type ResponseObject struct {
 		Data []Category `json:"data"`
 		Meta MetaData   `json:"meta"`
 	}
 	var response ResponseObject
 
-	var categoriesURL string = client.BaseURL.JoinPath("/catalog/categories").String()
+	queryParams, err := paramString(params)
+
+	if err != nil {
+		return response.Data, response.Meta, err
+	}
+
+	var categoriesURL string = client.BaseURL.JoinPath("/catalog/categories").String() + queryParams
 
 	resp, err := client.Request("GET", categoriesURL)
 	if err != nil {
