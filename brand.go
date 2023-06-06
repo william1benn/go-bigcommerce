@@ -3,6 +3,7 @@ package bigcommerce
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 )
 
 type Brand struct {
@@ -89,4 +90,32 @@ func (client *Client) GetBrands(params BrandQueryParams) ([]Brand, MetaData, err
 
 	return response.Data, response.Meta, nil
 
+}
+
+func (client *Client) GetFullBrandCatalog(limit int) ([]Brand, error) {
+	var brands []Brand
+	page := 1
+	end := false
+
+	for !end {
+		b, m, err := client.GetBrands(BrandQueryParams{Limit: limit, Page: page})
+		if err != nil {
+			return brands, err
+		}
+
+		details := m.Pagination
+		log.Printf("Fetched %d brands. Current page: %d", details.Count, details.CurrentPage)
+
+		for i := 0; i < len(b); i++ {
+			brands = append(brands, b[i])
+		}
+
+		if len(b) < limit {
+			end = true
+			break
+		}
+
+		page++
+	}
+	return brands, nil
 }
