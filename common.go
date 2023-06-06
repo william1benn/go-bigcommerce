@@ -21,3 +21,10 @@ type Pagination struct {
 type Links struct {
 	Current string `json:"current"`
 }
+
+type ErrorPayload struct {
+	Status   int    `json:"status"`
+	Title    string `json:"title"`
+	Type     string `json:"type"`
+	Instance string `json:"instance"`
+}
