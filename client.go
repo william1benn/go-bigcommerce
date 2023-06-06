@@ -28,7 +28,7 @@ func (c *Client) configureRequest(httpMethod string, relativeUrl string) (*http.
 	// Create a GET request
 	req, err := http.NewRequest(httpMethod, relativeUrl, nil)
 	if err != nil {
-		return req, err
+		return nil, err
 	}
 	req.Header.Set("x-auth-token", c.AuthToken)
 
@@ -36,16 +36,14 @@ func (c *Client) configureRequest(httpMethod string, relativeUrl string) (*http.
 }
 
 func (c *Client) Request(httpMethod string, relativeUrl string) (*http.Response, error) {
-	var resp *http.Response
-
 	req, err := c.configureRequest(httpMethod, relativeUrl)
 	if err != nil {
-		return resp, err
+		return nil, err
 	}
 
-	resp, err = c.httpClient.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return resp, err
+		return nil, err
 	}
 
 	return resp, nil
