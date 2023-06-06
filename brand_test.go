@@ -7,7 +7,7 @@ import (
 func TestGetBrand(t *testing.T) {
 	fs, _ := getClient()
 
-	brandId := 1
+	brandId := 49
 
 	brand, err := fs.GetBrand(brandId)
 
@@ -16,7 +16,7 @@ func TestGetBrand(t *testing.T) {
 	}
 
 	if brand.ID != brandId {
-		t.Error("response brand-id does not match request brand id")
+		t.Errorf("response brand-id does not match request brand id. Expected %d got %d", brandId, brand.ID)
 	}
 }
 

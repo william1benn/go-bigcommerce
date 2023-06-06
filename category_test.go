@@ -6,15 +6,24 @@ func TestGetCategory(t *testing.T) {
 
 	fs, _ := getClient()
 
-	categoryId := 11
+	categoryIdDoesNotExist := 11
 
-	category, err := fs.GetCategory(categoryId)
+	_, err := fs.GetCategory(categoryIdDoesNotExist)
+
+	if err == nil {
+		t.Error("Expected Error")
+	}
+
+	categoryIdDoesExist := 27
+
+	category, err := fs.GetCategory(categoryIdDoesExist)
 
 	if err != nil {
 		t.Error(err)
+		return
 	}
 
-	if category.ID != categoryId {
+	if category.ID != categoryIdDoesExist {
 		t.Error("reponse-category id soes not match request category id")
 	}
 

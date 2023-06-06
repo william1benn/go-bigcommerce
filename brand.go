@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 )
 
 type Brand struct {
@@ -32,9 +33,14 @@ func (client *Client) GetBrand(id int) (Brand, error) {
 	}
 	defer resp.Body.Close()
 
-	err = json.NewDecoder(resp.Body).Decode(&response)
+	if resp.StatusCode != http.StatusOK {
+		if resp.StatusCode == http.StatusNotFound {
+			return response.Data, errors.New("resource not found")
+		}
+		return response.Data, errors.New("something went wrong")
+	}
 
-	if err != nil {
+	if err = json.NewDecoder(resp.Body).Decode(&response); err != nil {
 		return response.Data, err
 	}
 
