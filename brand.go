@@ -2,9 +2,7 @@ package bigcommerce
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
-	"net/http"
 )
 
 type Brand struct {
@@ -33,11 +31,8 @@ func (client *Client) GetBrand(id int) (Brand, error) {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		if resp.StatusCode == http.StatusNotFound {
-			return response.Data, errors.New("resource not found")
-		}
-		return response.Data, errors.New("something went wrong")
+	if err = expectStatusCode(200, resp); err != nil {
+		return response.Data, err
 	}
 
 	if err = json.NewDecoder(resp.Body).Decode(&response); err != nil {
@@ -62,8 +57,8 @@ func (client *Client) GetBrands() ([]Brand, MetaData, error) {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
-		return response.Data, response.Meta, errors.New("API responded with a non 200 status code")
+	if err = expectStatusCode(200, resp); err != nil {
+		return response.Data, response.Meta, err
 	}
 
 	if err = json.NewDecoder(resp.Body).Decode(&response); err != nil {
