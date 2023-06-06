@@ -56,3 +56,17 @@ func TestGetAllProducts(t *testing.T) {
 	}
 
 }
+
+func TestGetFullProductCatalog(t *testing.T) {
+	fs, _ := getClient()
+
+	products, err := fs.GetFullProductCatalog(250)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	if len(products) != 69 {
+		t.Error("did not fetch all products")
+	}
+}

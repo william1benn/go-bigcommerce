@@ -3,6 +3,7 @@ package bigcommerce
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 )
 
 func (client *Client) GetProduct(id int) (Product, error) {
@@ -62,6 +63,35 @@ func (client *Client) GetAllProducts(params ProductQueryParams) ([]Product, Meta
 	}
 
 	return response.Data, response.Meta, nil
+}
+
+func (client *Client) GetFullProductCatalog(limit int) ([]Product, error) {
+	var products []Product
+	page := 1
+	end := false
+
+	for !end {
+		p, m, err := client.GetAllProducts(ProductQueryParams{Limit: limit, Page: page})
+		if err != nil {
+			return products, err
+		}
+
+		details := m.Pagination
+		log.Printf("Fetched %d products. Current page: %d", details.Count, details.CurrentPage)
+
+		for i := 0; i < len(p); i++ {
+			products = append(products, p[i])
+		}
+
+		if len(p) < limit {
+			end = true
+			break
+		}
+
+		page++
+	}
+
+	return products, nil
 }
 
 type Product struct {
