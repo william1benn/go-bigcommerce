@@ -2,7 +2,6 @@ package bigcommerce
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 )
 
@@ -77,7 +76,6 @@ type Product struct {
 }
 
 func (client *Client) GetProduct(id int) (Product, error) {
-
 	type ResponseObject struct {
 		Data Product  `json:"data"`
 		Meta MetaData `json:"meta"`
@@ -93,15 +91,11 @@ func (client *Client) GetProduct(id int) (Product, error) {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
-		return response.Data, errors.New(
-			"API responded with a non 200 status code",
-		)
+	if err = expectStatusCode(200, resp); err != nil {
+		return response.Data, err
 	}
 
-	err = json.NewDecoder(resp.Body).Decode(&response)
-	// Read the response body
-	if err != nil {
+	if err = json.NewDecoder(resp.Body).Decode(&response); err != nil {
 		return response.Data, err
 	}
 
@@ -123,13 +117,11 @@ func (client *Client) GetAllProducts() ([]Product, MetaData, error) {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
-		return response.Data, response.Meta, errors.New("API responded with a non 200 status code")
+	if err = expectStatusCode(200, resp); err != nil {
+		return response.Data, response.Meta, err
 	}
 
-	err = json.NewDecoder(resp.Body).Decode(&response)
-
-	if err != nil {
+	if err = json.NewDecoder(resp.Body).Decode(&response); err != nil {
 		return response.Data, response.Meta, err
 	}
 

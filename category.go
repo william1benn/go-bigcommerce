@@ -2,7 +2,6 @@ package bigcommerce
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 )
 
@@ -34,20 +33,16 @@ func (client *Client) GetCategory(id int) (Category, error) {
 	var categoryURL string = client.BaseURL.JoinPath("/catalog/categories", fmt.Sprint(id)).String()
 
 	resp, err := client.Request("GET", categoryURL)
-
 	if err != nil {
 		return response.Data, err
 	}
-
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
-		return response.Data, errors.New("API responded with a non 200 statuscode")
+	if err = expectStatusCode(200, resp); err != nil {
+		return response.Data, err
 	}
 
-	err = json.NewDecoder(resp.Body).Decode(&response)
-
-	if err != nil {
+	if err = json.NewDecoder(resp.Body).Decode(&response); err != nil {
 		return response.Data, err
 	}
 
@@ -64,23 +59,18 @@ func (client *Client) GetCategories() ([]Category, MetaData, error) {
 	var categoriesURL string = client.BaseURL.JoinPath("/catalog/categories").String()
 
 	resp, err := client.Request("GET", categoriesURL)
-
 	if err != nil {
 		return response.Data, response.Meta, err
 	}
-
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
-		return response.Data, response.Meta, errors.New("API responded with a non 200 status code")
+	if err = expectStatusCode(200, resp); err != nil {
+		return response.Data, response.Meta, err
 	}
 
-	err = json.NewDecoder(resp.Body).Decode(&response)
-
-	if err != nil {
+	if err = json.NewDecoder(resp.Body).Decode(&response); err != nil {
 		return response.Data, response.Meta, err
 	}
 
 	return response.Data, response.Meta, nil
-
 }

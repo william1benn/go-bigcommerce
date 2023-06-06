@@ -52,7 +52,6 @@ func expectStatusCode(expectedStatusCode int, response *http.Response) error {
 			errorPayload.Title,
 			errorPayload.Instance,
 		)
-
 	}
 	return nil
 }
