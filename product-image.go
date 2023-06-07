@@ -1,5 +1,10 @@
 package bigcommerce
 
+import (
+	"encoding/json"
+	"fmt"
+)
+
 type ProductImage struct {
 	ImageFile    string `json:"image_file"`
 	IsThumbnail  bool   `json:"is_thumbnail"`
@@ -21,7 +26,23 @@ func (client *Client) GetAllProductImages(productID int) ([]ProductImage, error)
 		Meta MetaData       `json:"meta"`
 	}
 	var response ResponseObject
-	// /catalog/products/{product_id}/images
+
+	getAllImagesPath := client.BaseURL.JoinPath("/catalog/products", fmt.Sprint(productID), "images").String()
+
+	resp, err := client.Request("GET", getAllImagesPath)
+	if err != nil {
+		return response.Data, err
+	}
+	defer resp.Body.Close()
+
+	if err = expectStatusCode(200, resp); err != nil {
+		return response.Data, err
+	}
+
+	if err = json.NewDecoder(resp.Body).Decode(&response); err != nil {
+		return response.Data, err
+	}
+
 	return response.Data, nil
 }
 func (client *Client) GetProductImage(productID int, imageID int) (ProductImage, error) {
@@ -31,6 +52,23 @@ func (client *Client) GetProductImage(productID int, imageID int) (ProductImage,
 	}
 	var response ResponseObject
 	// /catalog/products/{product_id}/images/{image_id}
+
+	getProductImagePath := client.BaseURL.JoinPath("/catalog/products", fmt.Sprint(productID), "images", fmt.Sprint(imageID)).String()
+
+	resp, err := client.Request("GET", getProductImagePath)
+	if err != nil {
+		return response.Data, err
+	}
+	defer resp.Body.Close()
+
+	if err = expectStatusCode(200, resp); err != nil {
+		return response.Data, err
+	}
+
+	if err = json.NewDecoder(resp.Body).Decode(&response); err != nil {
+		return response.Data, err
+	}
+
 	return response.Data, nil
 }
 func (client *Client) CreateProductImage(productID int, params CreateProductImageParams) (ProductImage, error) {
