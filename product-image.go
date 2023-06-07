@@ -1,0 +1,88 @@
+package bigcommerce
+
+type ProductImage struct {
+	ImageFile    string `json:"image_file"`
+	IsThumbnail  bool   `json:"is_thumbnail"`
+	SortOrder    int    `json:"sort_order"`
+	Description  string `json:"description"`
+	ImageURL     string `json:"image_url"`
+	ID           int    `json:"id"`
+	ProductID    int    `json:"product_id"`
+	URLZoom      string `json:"url_zoom"`
+	URLStandard  string `json:"url_standard"`
+	URLThumbnail string `json:"url_thumbnail"`
+	URLTiny      string `json:"url_tiny"`
+	DateModified string `json:"date_modified"`
+}
+
+func (client *Client) GetAllProductImages(productID int) ([]ProductImage, error) {
+	type ResponseObject struct {
+		Data []ProductImage `json:"data"`
+		Meta MetaData       `json:"meta"`
+	}
+	var response ResponseObject
+	// /catalog/products/{product_id}/images
+	return response.Data, nil
+}
+func (client *Client) GetProductImage(productID int, imageID int) (ProductImage, error) {
+	type ResponseObject struct {
+		Data ProductImage `json:"data"`
+		Meta MetaData     `json:"meta"`
+	}
+	var response ResponseObject
+	// /catalog/products/{product_id}/images/{image_id}
+	return response.Data, nil
+}
+func (client *Client) CreateProductImage(productID int, params CreateProductImageParams) (ProductImage, error) {
+	type ResponseObject struct {
+		Data ProductImage `json:"data"`
+		Meta MetaData     `json:"meta"`
+	}
+	var response ResponseObject
+	// POST /catalog/products/{product_id}/images
+	return response.Data, nil
+
+}
+func (client *Client) UpdateProductImage(productID int, imageID int, params UpdateProductImageParams) (ProductImage, error) {
+	type ResponseObject struct {
+		Data ProductImage `json:"data"`
+		Meta MetaData     `json:"meta"`
+	}
+	var response ResponseObject
+	// PUT /catalog/products/{product_id}/images/{image_id}
+
+	return response.Data, nil
+
+}
+func (client *Client) DeleteProductImage(productID int, imageID int) (bool, error) {
+	var ok bool = false
+	// DELETE /catalog/products/{product_id}/images/{image_id}
+	return ok, nil
+}
+
+type CreateProductImageParams struct {
+	ProductID    int    `json:"product_id"`
+	ImageFile    string `json:"image_file,omitempty"`
+	URLZoom      string `json:"url_zoom,omitempty"`
+	URLStandard  string `json:"url_standard,omitempty"`
+	URLThumbnail string `json:"url_thumbnail,omitempty"`
+	URLTiny      string `json:"url_tiny,omitempty"`
+	DateModified string `json:"date_modified,omitempty"`
+	IsThumbnail  bool   `json:"is_thumbnail,omitempty"`
+	SortOrder    int    `json:"sort_order,omitempty"`
+	Description  string `json:"description,omitempty"`
+	ImageURL     string `json:"image_url,omitempty"`
+}
+
+type UpdateProductImageParams struct {
+	ProductID    int    `json:"product_id,omitempty"`
+	URLZoom      string `json:"url_zoom,omitempty"`
+	URLStandard  string `json:"url_standard,omitempty"`
+	URLThumbnail string `json:"url_thumbnail,omitempty"`
+	URLTiny      string `json:"url_tiny,omitempty"`
+	ImageFile    string `json:"image_file,omitempty"`
+	IsThumbnail  bool   `json:"is_thumbnail,omitempty"`
+	SortOrder    int    `json:"sort_order,omitempty"`
+	Description  string `json:"description,omitempty"`
+	ImageURL     string `json:"image_url,omitempty"`
+}

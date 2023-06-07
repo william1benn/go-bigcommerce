@@ -295,21 +295,6 @@ type ProductVideo struct {
 	Length      string `json:"length"`
 }
 
-type ProductImage struct {
-	ImageFile    string `json:"image_file"`
-	IsThumbnail  bool   `json:"is_thumbnail"`
-	SortOrder    int    `json:"sort_order"`
-	Description  string `json:"description"`
-	ImageURL     string `json:"image_url"`
-	ID           int    `json:"id"`
-	ProductID    int    `json:"product_id"`
-	URLZoom      string `json:"url_zoom"`
-	URLStandard  string `json:"url_standard"`
-	URLThumbnail string `json:"url_thumbnail"`
-	URLTiny      string `json:"url_tiny"`
-	DateModified string `json:"date_modified"`
-}
-
 type ProductBulkPricingRule struct {
 	ID          int    `json:"id"`
 	QuantityMin int    `json:"quantity_min"`
