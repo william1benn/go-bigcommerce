@@ -30,7 +30,7 @@ func (client *Client) GetRedirects(params RedirectQueryParams) ([]Redirect, erro
 
 	getRedirectsURL := client.BaseURL.JoinPath("/storefront/redirects").String() + queryParams
 
-	resp, err := client.Request("GET", getRedirectsURL)
+	resp, err := client.Get(getRedirectsURL)
 	if err != nil {
 		return response.Data, err
 	}

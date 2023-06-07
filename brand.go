@@ -42,7 +42,7 @@ func (client *Client) GetBrand(id int) (Brand, error) {
 
 	brandURL := client.BaseURL.JoinPath("/catalog/brands", fmt.Sprint(id)).String()
 
-	resp, err := client.Request("GET", brandURL)
+	resp, err := client.Get(brandURL)
 	if err != nil {
 		return response.Data, nil
 	}
@@ -74,7 +74,7 @@ func (client *Client) GetBrands(params BrandQueryParams) ([]Brand, MetaData, err
 
 	brandsURL := client.BaseURL.JoinPath("/catalog/brands").String() + queryParams
 
-	resp, err := client.Request("GET", brandsURL)
+	resp, err := client.Get(brandsURL)
 	if err != nil {
 		return response.Data, response.Meta, err
 	}

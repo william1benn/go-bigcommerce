@@ -59,7 +59,7 @@ func (client *Client) GetCategory(id int) (Category, error) {
 
 	var categoryURL string = client.BaseURL.JoinPath("/catalog/categories", fmt.Sprint(id)).String()
 
-	resp, err := client.Request("GET", categoryURL)
+	resp, err := client.Get(categoryURL)
 	if err != nil {
 		return response.Data, err
 	}
@@ -91,7 +91,7 @@ func (client *Client) GetCategories(params CategoryQueryParams) ([]Category, Met
 
 	var categoriesURL string = client.BaseURL.JoinPath("/catalog/categories").String() + queryParams
 
-	resp, err := client.Request("GET", categoriesURL)
+	resp, err := client.Get(categoriesURL)
 	if err != nil {
 		return response.Data, response.Meta, err
 	}

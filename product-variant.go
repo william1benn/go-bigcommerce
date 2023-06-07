@@ -19,7 +19,7 @@ func (client *Client) GetProductVariants(productID int, params ProductVariantQue
 
 	getProductVariantsURL := client.BaseURL.JoinPath("/catalog/products", fmt.Sprint(productID), "/variants").String() + queryParams
 
-	resp, err := client.Request("GET", getProductVariantsURL)
+	resp, err := client.Get(getProductVariantsURL)
 	if err != nil {
 		return response.Data, response.Meta, err
 	}

@@ -30,7 +30,7 @@ func (client *Client) GetAllProductVideos(productID int, params GetAllProductVid
 
 	getProductVideosPath := client.BaseURL.JoinPath("/catalog/products/", fmt.Sprint(productID), "/videos").String() + queryParams
 
-	resp, err := client.Request("GET", getProductVideosPath)
+	resp, err := client.Get(getProductVideosPath)
 	if err != nil {
 		return response.Data, response.Meta, err
 	}

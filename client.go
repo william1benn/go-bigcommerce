@@ -66,5 +66,5 @@ func (client *Client) Post(url string, payload *bytes.Buffer) (*http.Response, e
 }
 
 func (client *Client) Delete(url string) (*http.Response, error) {
-	return client.Request("DELETE", url)
+	return client.Request("DELETE", url, nil)
 }

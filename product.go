@@ -16,7 +16,7 @@ func (client *Client) GetProduct(id int) (Product, error) {
 	getProductUrl := client.BaseURL.JoinPath("/catalog/products/", fmt.Sprint(id)).String()
 
 	// Send the request
-	resp, err := client.Request("GET", getProductUrl)
+	resp, err := client.Get(getProductUrl)
 	if err != nil {
 		return response.Data, err
 	}
@@ -48,7 +48,7 @@ func (client *Client) GetAllProducts(params ProductQueryParams) ([]Product, Meta
 
 	getProductsUrl := client.BaseURL.JoinPath("/catalog/products").String() + queryParams
 
-	resp, err := client.Request("GET", getProductsUrl)
+	resp, err := client.Get(getProductsUrl)
 	if err != nil {
 		return response.Data, response.Meta, err
 	}

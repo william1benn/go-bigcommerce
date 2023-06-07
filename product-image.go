@@ -29,7 +29,7 @@ func (client *Client) GetAllProductImages(productID int) ([]ProductImage, error)
 
 	getAllImagesPath := client.BaseURL.JoinPath("/catalog/products", fmt.Sprint(productID), "images").String()
 
-	resp, err := client.Request("GET", getAllImagesPath)
+	resp, err := client.Get(getAllImagesPath)
 	if err != nil {
 		return response.Data, err
 	}
@@ -54,7 +54,7 @@ func (client *Client) GetProductImage(productID int, imageID int) (ProductImage,
 
 	getProductImagePath := client.BaseURL.JoinPath("/catalog/products", fmt.Sprint(productID), "images", fmt.Sprint(imageID)).String()
 
-	resp, err := client.Request("GET", getProductImagePath)
+	resp, err := client.Get(getProductImagePath)
 	if err != nil {
 		return response.Data, err
 	}
@@ -94,7 +94,7 @@ func (client *Client) UpdateProductImage(productID int, imageID int, params Upda
 func (client *Client) DeleteProductImage(productID int, imageID int) (bool, error) {
 	deleteProductImagePath := client.BaseURL.JoinPath("/catalog/products", fmt.Sprint(productID), "images", fmt.Sprint(imageID)).String()
 
-	resp, err := client.Request("DELETE", deleteProductImagePath)
+	resp, err := client.Delete(deleteProductImagePath)
 	if err != nil {
 		return false, err
 	}
