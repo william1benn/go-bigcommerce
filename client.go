@@ -1,6 +1,7 @@
 package bigcommerce
 
 import (
+	"bytes"
 	"log"
 	"net/http"
 	"net/url"
@@ -26,9 +27,9 @@ func NewClient(version string, storeHash string, authToken string) Client {
 	return client
 }
 
-func (c *Client) configureRequest(httpMethod string, relativeUrl string) (*http.Request, error) {
+func (c *Client) configureRequest(httpMethod string, relativeUrl string, payload *bytes.Buffer) (*http.Request, error) {
 	// Create a GET request
-	req, err := http.NewRequest(httpMethod, relativeUrl, nil)
+	req, err := http.NewRequest(httpMethod, relativeUrl, payload)
 	if err != nil {
 		return nil, err
 	}
@@ -38,8 +39,8 @@ func (c *Client) configureRequest(httpMethod string, relativeUrl string) (*http.
 	return req, nil
 }
 
-func (c *Client) Request(httpMethod string, relativeUrl string) (*http.Response, error) {
-	req, err := c.configureRequest(httpMethod, relativeUrl)
+func (c *Client) Request(httpMethod string, relativeUrl string, payload *bytes.Buffer) (*http.Response, error) {
+	req, err := c.configureRequest(httpMethod, relativeUrl, payload)
 	if err != nil {
 		return nil, err
 	}
@@ -50,4 +51,20 @@ func (c *Client) Request(httpMethod string, relativeUrl string) (*http.Response,
 	}
 
 	return resp, nil
+}
+
+func (client *Client) Get(url string) (*http.Response, error) {
+	return client.Request("GET", url, nil)
+}
+
+func (client *Client) Put(url string, payload *bytes.Buffer) (*http.Response, error) {
+	return client.Request("PUT", url, payload)
+}
+
+func (client *Client) Post(url string, payload *bytes.Buffer) (*http.Response, error) {
+	return client.Request("POST", url, payload)
+}
+
+func (client *Client) Delete(url string) (*http.Response, error) {
+	return client.Request("DELETE", url)
 }

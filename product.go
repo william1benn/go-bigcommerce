@@ -1,9 +1,9 @@
 package bigcommerce
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 )
 
 func (client *Client) GetProduct(id int) (Product, error) {
@@ -71,13 +71,10 @@ func (client *Client) GetFullProductCatalog(limit int) ([]Product, error) {
 	end := false
 
 	for !end {
-		p, m, err := client.GetAllProducts(ProductQueryParams{Limit: limit, Page: page})
+		p, _, err := client.GetAllProducts(ProductQueryParams{Limit: limit, Page: page})
 		if err != nil {
 			return products, err
 		}
-
-		details := m.Pagination
-		log.Printf("Fetched %d products. Current page: %d", details.Count, details.CurrentPage)
 
 		for i := 0; i < len(p); i++ {
 			products = append(products, p[i])
@@ -92,6 +89,31 @@ func (client *Client) GetFullProductCatalog(limit int) ([]Product, error) {
 	}
 
 	return products, nil
+}
+
+func (client *Client) UpdateProduct(productId int, params UpdateProductParams) (Product, error) {
+	type ResponseObject struct {
+		Data Product  `json:"data"`
+		Meta MetaData `json:"meta"`
+	}
+	var response ResponseObject
+
+	updateProductPath := client.BaseURL.JoinPath("/catalog/products", fmt.Sprint(productId)).String()
+
+	payloadBytes, err := json.Marshal(params)
+	if err != nil {
+		return response.Data, err
+	}
+
+	payloadBuffer := bytes.NewBuffer(payloadBytes)
+
+	resp, err := client.Put(updateProductPath, payloadBuffer)
+	if err != nil {
+		return response.Data, err
+	}
+	defer resp.Body.Close()
+
+	return response.Data, nil
 }
 
 type Product struct {
