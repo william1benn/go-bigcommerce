@@ -28,8 +28,15 @@ func NewClient(version string, storeHash string, authToken string) Client {
 }
 
 func (c *Client) configureRequest(httpMethod string, relativeUrl string, payload *bytes.Buffer) (*http.Request, error) {
-	// Create a GET request
-	req, err := http.NewRequest(httpMethod, relativeUrl, payload)
+	var req *http.Request
+	var err error
+	// I dont understand why this works...
+	// solves a nil pointer dereference issue but not sure why
+	if payload != nil {
+		req, err = http.NewRequest(httpMethod, relativeUrl, payload)
+	} else {
+		req, err = http.NewRequest(httpMethod, relativeUrl, nil)
+	}
 	if err != nil {
 		return nil, err
 	}
