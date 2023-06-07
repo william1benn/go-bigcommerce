@@ -48,7 +48,7 @@ func (client *Client) GetRedirects(params RedirectQueryParams) ([]Redirect, erro
 }
 
 type RedirectQueryParams struct {
-	SiteID    int    `url:"ite_id,omitempty"`
+	SiteID    int    `url:"site_id,omitempty"`
 	IDs       []int  `url:"id,omitempty"`
 	Limit     int    `url:"limit,omitempty"`
 	Page      int    `url:"page,omitempty"`
