@@ -284,27 +284,10 @@ type UpdateProductParams struct {
 	Variants                []ProductVariant         `json:"variants,omitempty"`
 }
 
-type ProductVideo struct {
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	SortOrder   int    `json:"sort_order"`
-	Type        string `json:"type"`
-	VideoID     string `json:"video_id"`
-	ID          int    `json:"id"`
-	ProductID   int    `json:"product_id"`
-	Length      string `json:"length"`
-}
-
 type ProductBulkPricingRule struct {
 	ID          int    `json:"id"`
 	QuantityMin int    `json:"quantity_min"`
 	QuantityMax int    `json:"quantity_max"`
 	Type        string `json:"type"`
 	Amount      string `json:"amount"`
-}
-
-type ProductCustomField struct {
-	ID    int    `json:"id"`
-	Name  string `json:"name"`
-	Value string `json:"value"`
 }
