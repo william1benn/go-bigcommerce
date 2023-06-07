@@ -51,7 +51,6 @@ func (client *Client) GetProductImage(productID int, imageID int) (ProductImage,
 		Meta MetaData     `json:"meta"`
 	}
 	var response ResponseObject
-	// /catalog/products/{product_id}/images/{image_id}
 
 	getProductImagePath := client.BaseURL.JoinPath("/catalog/products", fmt.Sprint(productID), "images", fmt.Sprint(imageID)).String()
 
@@ -93,9 +92,19 @@ func (client *Client) UpdateProductImage(productID int, imageID int, params Upda
 
 }
 func (client *Client) DeleteProductImage(productID int, imageID int) (bool, error) {
-	var ok bool = false
-	// DELETE /catalog/products/{product_id}/images/{image_id}
-	return ok, nil
+	deleteProductImagePath := client.BaseURL.JoinPath("/catalog/products", fmt.Sprint(productID), "images", fmt.Sprint(imageID)).String()
+
+	resp, err := client.Request("DELETE", deleteProductImagePath)
+	if err != nil {
+		return false, err
+	}
+	defer resp.Body.Close()
+
+	if err = expectStatusCode(204, resp); err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 type CreateProductImageParams struct {
