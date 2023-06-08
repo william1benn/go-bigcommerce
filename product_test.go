@@ -1,6 +1,7 @@
 package bigcommerce
 
 import (
+	"encoding/json"
 	"os"
 	"testing"
 
@@ -68,5 +69,49 @@ func TestGetFullProductCatalog(t *testing.T) {
 
 	if len(products) != 69 {
 		t.Error("did not fetch all products")
+	}
+}
+
+func TestMarshalUpdateProductParams(t *testing.T) {
+	paramsStruct := UpdateProductParams{Name: "updated name"}
+	paramBytes, err := json.Marshal(paramsStruct)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	jsonString := string(paramBytes)
+	expectedJsonString := `{"name":"updated name"}`
+	if jsonString != expectedJsonString {
+		t.Errorf("expected %s but received %s instead", expectedJsonString, jsonString)
+		return
+	}
+
+	paramsStruct = UpdateProductParams{Description: "updated description"}
+	paramBytes, err = json.Marshal(paramsStruct)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	jsonString = string(paramBytes)
+	expectedJsonString = `{"description":"updated description"}`
+	if jsonString != expectedJsonString {
+		t.Errorf("expected %s but received %s instead", expectedJsonString, jsonString)
+		return
+	}
+
+	paramsStruct = UpdateProductParams{CustomURL: &CustomURL{
+		URL:          "/new-url",
+		IsCustomized: true,
+	}}
+	paramBytes, err = json.Marshal(paramsStruct)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	jsonString = string(paramBytes)
+	expectedJsonString = `{"custom_url":{"url":"/new-url","is_customized":true}}`
+	if jsonString != expectedJsonString {
+		t.Errorf("expected %s but received %s instead", expectedJsonString, jsonString)
+		return
 	}
 }
