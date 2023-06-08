@@ -27,26 +27,19 @@ func NewClient(version string, storeHash string, authToken string) Client {
 	return client
 }
 
-func (c *Client) configureRequest(httpMethod string, relativeUrl string, payload *bytes.Buffer) (*http.Request, error) {
-	var req *http.Request
-	var err error
-	// I dont understand why this works...
-	// solves a nil pointer dereference issue but not sure why
-	if payload != nil {
-		req, err = http.NewRequest(httpMethod, relativeUrl, payload)
-	} else {
-		req, err = http.NewRequest(httpMethod, relativeUrl, nil)
-	}
+func (c *Client) configureRequest(httpMethod string, relativeUrl string, payload []byte) (*http.Request, error) {
+	req, err := http.NewRequest(httpMethod, relativeUrl, bytes.NewBuffer(payload))
 	if err != nil {
 		return nil, err
 	}
+
 	req.Header.Set("x-auth-token", c.AuthToken)
 	req.Header.Set("Accept", "application/json")
 
 	return req, nil
 }
 
-func (c *Client) Request(httpMethod string, relativeUrl string, payload *bytes.Buffer) (*http.Response, error) {
+func (c *Client) Request(httpMethod string, relativeUrl string, payload []byte) (*http.Response, error) {
 	req, err := c.configureRequest(httpMethod, relativeUrl, payload)
 	if err != nil {
 		return nil, err
@@ -61,17 +54,17 @@ func (c *Client) Request(httpMethod string, relativeUrl string, payload *bytes.B
 }
 
 func (client *Client) Get(url string) (*http.Response, error) {
-	return client.Request("GET", url, nil)
+	return client.Request("GET", url, []byte(""))
 }
 
-func (client *Client) Put(url string, payload *bytes.Buffer) (*http.Response, error) {
+func (client *Client) Put(url string, payload []byte) (*http.Response, error) {
 	return client.Request("PUT", url, payload)
 }
 
-func (client *Client) Post(url string, payload *bytes.Buffer) (*http.Response, error) {
+func (client *Client) Post(url string, payload []byte) (*http.Response, error) {
 	return client.Request("POST", url, payload)
 }
 
 func (client *Client) Delete(url string) (*http.Response, error) {
-	return client.Request("DELETE", url, nil)
+	return client.Request("DELETE", url, []byte(""))
 }
