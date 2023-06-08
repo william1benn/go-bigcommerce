@@ -92,7 +92,7 @@ func (client *Client) GetFullProductCatalog(limit int) ([]Product, error) {
 	return products, nil
 }
 
-func (client *Client) UpdateProduct(productId int, params UpdateProductParams) (Product, error) {
+func (client *Client) UpdateProduct(productId int, params CreateUpdateProductParams) (Product, error) {
 	type ResponseObject struct {
 		Data Product  `json:"data"`
 		Meta MetaData `json:"meta"`
@@ -111,6 +111,49 @@ func (client *Client) UpdateProduct(productId int, params UpdateProductParams) (
 		return response.Data, err
 	}
 	defer resp.Body.Close()
+
+	return response.Data, nil
+}
+
+func (client *Client) CreateProduct(params CreateUpdateProductParams) (Product, error) {
+	type ResponseObject struct {
+		Data Product  `json:"data"`
+		Meta MetaData `json:"meta"`
+	}
+	var response ResponseObject
+
+	noNameSupplied := params.Name == ""
+	invalidType := params.Type == "physical" || params.Type == "digital"
+	invalidWeight := params.Weight <= 0
+
+	if noNameSupplied || invalidType || invalidWeight {
+		return response.Data, fmt.Errorf("failed check of name, type and weight")
+	}
+
+	createProductPath := client.BaseURL.JoinPath("/catalog/products").String()
+
+	payloadBytes, err := json.Marshal(params)
+	if err != nil {
+		return response.Data, nil
+	}
+
+	resp, err := client.Post(createProductPath, payloadBytes)
+	if err != nil {
+		return response.Data, nil
+	}
+
+	err = expectStatusCode(200, resp)
+	if err != nil {
+		err = expectStatusCode(207, resp)
+		if err != nil {
+			return response.Data, err
+		}
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&response)
+	if err != nil {
+		return response.Data, err
+	}
 
 	return response.Data, nil
 }
@@ -236,7 +279,7 @@ type ProductQueryParams struct {
 	SKUIn                 []string `url:"sku:in,omitempty,comma"`
 }
 
-type UpdateProductParams struct {
+type CreateUpdateProductParams struct {
 	Name                    string                   `json:"name,omitempty" validate:"required,min=1,max=250"`
 	Type                    string                   `json:"type,omitempty" validate:"required,oneof=physical digital"`
 	SKU                     string                   `json:"sku,omitempty" validate:"max=255"`

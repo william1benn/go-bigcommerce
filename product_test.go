@@ -73,7 +73,7 @@ func TestGetFullProductCatalog(t *testing.T) {
 }
 
 func TestMarshalUpdateProductParams(t *testing.T) {
-	paramsStruct := UpdateProductParams{Name: "updated name"}
+	paramsStruct := CreateUpdateProductParams{Name: "updated name"}
 	paramBytes, err := json.Marshal(paramsStruct)
 	if err != nil {
 		t.Error(err)
@@ -86,7 +86,7 @@ func TestMarshalUpdateProductParams(t *testing.T) {
 		return
 	}
 
-	paramsStruct = UpdateProductParams{Description: "updated description"}
+	paramsStruct = CreateUpdateProductParams{Description: "updated description"}
 	paramBytes, err = json.Marshal(paramsStruct)
 	if err != nil {
 		t.Error(err)
@@ -99,7 +99,7 @@ func TestMarshalUpdateProductParams(t *testing.T) {
 		return
 	}
 
-	paramsStruct = UpdateProductParams{CustomURL: &CustomURL{
+	paramsStruct = CreateUpdateProductParams{CustomURL: &CustomURL{
 		URL:          "/new-url",
 		IsCustomized: true,
 	}}
