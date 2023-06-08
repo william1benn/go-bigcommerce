@@ -36,6 +36,65 @@ func (client *Client) GetProductVariants(productID int, params ProductVariantQue
 	return response.Data, response.Meta, nil
 }
 
+func (client *Client) CreateProductVariant(productID int, params ProductVariantCreateParams) (ProductVariant, error) {
+	type ResponseObject struct {
+		Data ProductVariant `json:"data"`
+		Meta MetaData       `json:"meta"`
+	}
+	var response ResponseObject
+
+	paramBytes, err := json.Marshal(params)
+	if err != nil {
+		return response.Data, err
+	}
+
+	createProductVariantPath := client.BaseURL.JoinPath("/catalog/products", fmt.Sprint(productID), "variants").String()
+
+	resp, err := client.Post(createProductVariantPath, paramBytes)
+	if err != nil {
+		return response.Data, err
+	}
+
+	err = expectStatusCode(200, resp)
+	if err != nil {
+		err = expectStatusCode(207, resp)
+		if err != nil {
+			return response.Data, err
+		}
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&response)
+	if err != nil {
+		return response.Data, err
+	}
+
+	return response.Data, nil
+}
+
+type ProductVariantCreateParams struct {
+	CostPrice                 float64          `json:"cost_price"`
+	Price                     float64          `json:"price"`
+	SalePrice                 float64          `json:"sale_price"`
+	RetailPrice               float64          `json:"retail_price"`
+	Weight                    float64          `json:"weight"`
+	Width                     float64          `json:"width"`
+	Height                    float64          `json:"height"`
+	Depth                     float64          `json:"depth"`
+	IsFreeShipping            bool             `json:"is_free_shipping"`
+	FixedCostShippingPrice    float64          `json:"fixed_cost_shipping_price"`
+	PurchasingDisabled        bool             `json:"purchasing_disabled"`
+	PurchasingDisabledMessage string           `json:"purchasing_disabled_message"`
+	UPC                       string           `json:"upc"`
+	InventoryLevel            int              `json:"inventory_level"`
+	InventoryWarningLevel     int              `json:"inventory_warning_level"`
+	BinPickingNumber          string           `json:"bin_picking_number"`
+	ImageURL                  string           `json:"image_url"`
+	GTIN                      string           `json:"gtin"`
+	MPN                       string           `json:"mpn"`
+	ProductID                 int              `json:"product_id"`
+	SKU                       string           `json:"sku"`
+	OptionValues              *[]VariantOption `json:"option_values"`
+}
 type ProductVariant struct {
 	ID                        int             `json:"id"`
 	ProductID                 int             `json:"product_id"`
