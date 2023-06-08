@@ -11,10 +11,10 @@ type ProductCustomField struct {
 	Value string `json:"value"`
 }
 
-func (client *Client) GetCustomFields(productID int, params ProductCustomFieldsRequestParams) (ProductCustomField, error) {
+func (client *Client) GetCustomFields(productID int, params ProductCustomFieldsRequestParams) ([]ProductCustomField, error) {
 	type ResponseObject struct {
-		Data ProductCustomField `json:"data"`
-		Meta MetaData           `json:"meta"`
+		Data []ProductCustomField `json:"data"`
+		Meta MetaData             `json:"meta"`
 	}
 	var response ResponseObject
 	// /catalog/products/{product_id}/custom-fields
