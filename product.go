@@ -5,6 +5,8 @@ import (
 	"fmt"
 )
 
+//TODO add a GetBrand/GetCategories function that returns brand or slice of categories arg can be pointer and if nil can call the api
+
 func (client *Client) GetProduct(id int) (Product, error) {
 	type ResponseObject struct {
 		Data Product  `json:"data"`
