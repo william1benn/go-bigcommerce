@@ -32,6 +32,8 @@ func (client *Client) GetProduct(id int) (Product, error) {
 	return response.Data, nil
 }
 
+//TODO maybe change this to getproduct, getproducts and getAllProducts, and have the ability to pass params to get all products
+
 func (client *Client) GetAllProducts(params ProductQueryParams) ([]Product, MetaData, error) {
 	type ResponseObject struct {
 		Data []Product `json:"data"`
