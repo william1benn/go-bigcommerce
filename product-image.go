@@ -109,6 +109,30 @@ func (client *Client) UpdateProductImage(productID int, imageID int, params Upda
 	}
 	var response ResponseObject
 	// PUT /catalog/products/{product_id}/images/{image_id}
+	updateProductImagePath := client.BaseURL.JoinPath("/catalog/products", fmt.Sprint(productID), "images", fmt.Sprint(imageID)).String()
+
+	paramBytes, err := json.Marshal(params)
+	if err != nil {
+		return response.Data, err
+	}
+
+	resp, err := client.Put(updateProductImagePath, paramBytes)
+	if err != nil {
+		return response.Data, err
+	}
+
+	err = expectStatusCode(200, resp)
+	if err != nil {
+		err = expectStatusCode(201, resp)
+		if err != nil {
+			return response.Data, err
+		}
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&response)
+	if err != nil {
+		return response.Data, err
+	}
 
 	return response.Data, nil
 
