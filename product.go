@@ -1,7 +1,6 @@
 package bigcommerce
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 )
@@ -105,9 +104,7 @@ func (client *Client) UpdateProduct(productId int, params UpdateProductParams) (
 		return response.Data, err
 	}
 
-	payloadBuffer := bytes.NewBuffer(payloadBytes)
-
-	resp, err := client.Put(updateProductPath, payloadBuffer)
+	resp, err := client.Put(updateProductPath, payloadBytes)
 	if err != nil {
 		return response.Data, err
 	}
@@ -286,7 +283,7 @@ type UpdateProductParams struct {
 	IsPreorderOnly          bool                     `json:"is_preorder_only,omitempty"`
 	IsPriceHidden           bool                     `json:"is_price_hidden,omitempty"`
 	PriceHiddenLabel        string                   `json:"price_hidden_label,omitempty"`
-	CustomURL               CustomURL                `json:"custom_url,omitempty"`
+	CustomURL               *CustomURL               `json:"custom_url,omitempty"`
 	OpenGraphType           string                   `json:"open_graph_type,omitempty"`
 	OpenGraphTitle          string                   `json:"open_graph_title,omitempty"`
 	OpenGraphDescription    string                   `json:"open_graph_description,omitempty"`
