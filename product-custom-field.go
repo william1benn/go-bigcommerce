@@ -139,7 +139,19 @@ func (client *Client) UpdateCustomField(productID int, customFieldID int, params
 	return response.Data, nil
 
 }
-func (client *Client) DeleteCustomField(productID int, customFieldID int) {}
+func (client *Client) DeleteCustomField(productID int, customFieldID int) error {
+	deleteCustomFieldPath := client.BaseURL.JoinPath("/catalog/products", fmt.Sprint(productID), "custom-fields", fmt.Sprint(customFieldID)).String()
+	resp, err := client.Delete(deleteCustomFieldPath)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	err = expectStatusCode(204, resp)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
 type ProductCustomFieldsRequestParams struct {
 	IncludeFields string `url:"include_fields,omitempty"`
