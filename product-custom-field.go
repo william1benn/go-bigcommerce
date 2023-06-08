@@ -106,7 +106,38 @@ func (client *Client) GetCustomField(productID int, customFieldID int) (ProductC
 
 	return response.Data, nil
 }
-func (client *Client) UpdateCustomField(productID int, customFieldID int, params UpdateCustomFieldParams) {
+func (client *Client) UpdateCustomField(productID int, customFieldID int, params UpdateCustomFieldParams) (ProductCustomField, error) {
+	type ResponseObject struct {
+		Data ProductCustomField `json:"data"`
+		Meta MetaData           `json:"meta"`
+	}
+	var response ResponseObject
+
+	paramBytes, err := json.Marshal(params)
+	if err != nil {
+		return response.Data, err
+	}
+
+	updateCustomFieldPath := client.BaseURL.JoinPath("/catalog/products", fmt.Sprint(productID), "custom-fields", fmt.Sprint(customFieldID)).String()
+
+	resp, err := client.Put(updateCustomFieldPath, paramBytes)
+	if err != nil {
+		return response.Data, err
+	}
+	defer resp.Body.Close()
+
+	err = expectStatusCode(200, resp)
+	if err != nil {
+		return response.Data, err
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&response)
+	if err != nil {
+		return response.Data, err
+	}
+
+	return response.Data, nil
+
 }
 func (client *Client) DeleteCustomField(productID int, customFieldID int) {}
 
