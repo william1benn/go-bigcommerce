@@ -43,7 +43,42 @@ func (client *Client) GetCustomFields(productID int, params ProductCustomFieldsR
 
 	return response.Data, nil
 }
-func (client *Client) CreateCustomFields(productID int, params CreateCustomFieldParams) {}
+func (client *Client) CreateCustomField(productID int, params CreateCustomFieldParams) (ProductCustomField, error) {
+	type ResponseObject struct {
+		Data ProductCustomField `json:"data"`
+		Meta MetaData           `json:"meta"`
+	}
+	var response ResponseObject
+
+	if params.Name == "" || params.Value == "" {
+		return response.Data, fmt.Errorf("check params, no empty values allowed name: %s, value: %s", params.Name, params.Value)
+	}
+
+	paramBytes, err := json.Marshal(params)
+	if err != nil {
+		return response.Data, err
+	}
+
+	createCustomFieldpath := client.BaseURL.JoinPath("/catalog/products", fmt.Sprint(productID), "/custom-fields").String()
+
+	resp, err := client.Post(createCustomFieldpath, paramBytes)
+	if err != nil {
+		return response.Data, err
+	}
+	defer resp.Body.Close()
+
+	err = expectStatusCode(200, resp)
+	if err != nil {
+		return response.Data, err
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&response)
+	if err != nil {
+		return response.Data, err
+	}
+
+	return response.Data, nil
+}
 func (client *Client) GetCustomField(productID int, customFieldID int) (ProductCustomField, error) {
 	type ResponseObject struct {
 		Data ProductCustomField `json:"data"`
