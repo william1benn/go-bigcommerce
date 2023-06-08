@@ -15,7 +15,7 @@ type OrderCoupon struct {
 	Discount float64 `json:"discount"`
 }
 
-func (orderCoupon OrderCoupon) TypeName() string {
+func (orderCoupon *OrderCoupon) TypeName() string {
 	var typeName string
 	switch orderCoupon.Type {
 	case 0:

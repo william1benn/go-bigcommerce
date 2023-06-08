@@ -12,8 +12,10 @@ go get github.com/seanomeara96/go-bigcommerce
 package main
 
 import (
-  "github.com/joho/godotenv"
-	bigcommerce "github.com/seanomeara96/go-bigcommerce"
+	"fmt"
+
+  	"github.com/joho/godotenv"
+  	bigcommerce "github.com/seanomeara96/go-bigcommerce"
 )
 
 func main() {
@@ -31,6 +33,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println(products)
 }
 
 ```
