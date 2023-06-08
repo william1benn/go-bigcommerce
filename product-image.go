@@ -77,6 +77,28 @@ func (client *Client) CreateProductImage(productID int, params CreateProductImag
 	}
 	var response ResponseObject
 	// POST /catalog/products/{product_id}/images
+	createProductImagePath := client.BaseURL.JoinPath("/catalog/products", fmt.Sprint(productID), "images").String()
+
+	paramBytes, err := json.Marshal(params)
+	if err != nil {
+		return response.Data, err
+	}
+
+	resp, err := client.Post(createProductImagePath, paramBytes)
+	if err != nil {
+		return response.Data, err
+	}
+
+	err = expectStatusCode(200, resp)
+	if err != nil {
+		return response.Data, err
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&response)
+	if err != nil {
+		return response.Data, err
+	}
+
 	return response.Data, nil
 
 }
