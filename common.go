@@ -9,8 +9,8 @@ import (
 )
 
 type CustomURL struct {
-	URL          string `json:"url"`
-	IsCustomized bool   `json:"is_customized"`
+	URL          string `json:"url,omitempty"`
+	IsCustomized bool   `json:"is_customized,omitempty"`
 }
 
 type MetaData struct {
