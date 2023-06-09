@@ -1,5 +1,7 @@
 package bigcommerce
 
+import "fmt"
+
 type ProductVariantOption struct {
 	ID           int           `json:"id"`
 	ProductID    int           `json:"product_id"`
@@ -9,6 +11,32 @@ type ProductVariantOption struct {
 	SortOrder    int           `json:"sort_order"`
 	OptionValues []OptionValue `json:"option_values"`
 	Name         string        `json:"name"`
+}
+
+func (client *Client) GetProductVariantOptions(product_id int) {
+	path := client.BaseURL.JoinPath("/catalog/products/", fmt.Sprint(product_id), "/options").String()
+}
+func (client *Client) CreateProductVariantOption(product_id int) {
+	path := client.BaseURL.JoinPath("/catalog/products/", fmt.Sprint(product_id), "/options").String()
+}
+func (client *Client) GetProductVariantOption(product_id, option_id int) {
+	path := client.BaseURL.JoinPath("/catalog/products/", fmt.Sprint(product_id), "/options", fmt.Sprint(option_id)).String()
+}
+func (client *Client) UpdateProductVariantOption(product_id, option_id int) {
+	path := client.BaseURL.JoinPath("/catalog/products/", fmt.Sprint(product_id), "/options", fmt.Sprint(option_id)).String()
+}
+func (client *Client) DeleteProductVariantOption(product_id, option_id int) error {
+	path := client.BaseURL.JoinPath("/catalog/products/", fmt.Sprint(product_id), "/options", fmt.Sprint(option_id)).String()
+	resp, err := client.Delete(path)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	err = expectStatusCode(204, resp)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 type OptionConfig struct {
