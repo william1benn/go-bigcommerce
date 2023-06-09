@@ -45,8 +45,31 @@ func (client *Client) GetProductVariantOptions(product_id int) ([]ProductVariant
 func (client *Client) CreateProductVariantOption(product_id int) {
 	path := client.BaseURL.JoinPath("/catalog/products/", fmt.Sprint(product_id), "/options").String()
 }
-func (client *Client) GetProductVariantOption(product_id, option_id int) {
+func (client *Client) GetProductVariantOption(product_id, option_id int) (ProductVariantOption, error) {
+	type ResponseObject struct {
+		Data ProductVariantOption `json:"data"`
+		Meta MetaData             `json:"meta"`
+	}
+	var response ResponseObject
 	path := client.BaseURL.JoinPath("/catalog/products/", fmt.Sprint(product_id), "/options", fmt.Sprint(option_id)).String()
+
+	resp, err := client.Get(path)
+	if err != nil {
+		return response.Data, err
+	}
+	defer resp.Body.Close()
+
+	err = expectStatusCode(200, resp)
+	if err != nil {
+		return response.Data, err
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&response)
+	if err != nil {
+		return response.Data, err
+	}
+
+	return response.Data, nil
 }
 func (client *Client) UpdateProductVariantOption(product_id, option_id int) {
 	path := client.BaseURL.JoinPath("/catalog/products/", fmt.Sprint(product_id), "/options", fmt.Sprint(option_id)).String()
