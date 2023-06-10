@@ -89,3 +89,19 @@ func (client *Client) GetBanner(bannerID int) (Banner, error) {
 
 	return response.Data, nil
 }
+
+func (client *Client) DeleteBanner(bannerID int) error {
+	path := client.BaseURL.JoinPath("banners", fmt.Sprint(bannerID)).String()
+	resp, err := client.Delete(path)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	err = expectStatusCode(204, resp)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
