@@ -43,7 +43,7 @@ func (ve ValidationErrors) Error() string {
 	return fmt.Sprintf("validation failed: %v", []string(ve))
 }
 
-func ValidateBannerParams(params CreateUpdateBannerParams) error {
+func validateBannerParams(params CreateUpdateBannerParams) error {
 	var errors ValidationErrors
 
 	if params.Name == "" {
@@ -108,7 +108,7 @@ func (client *Client) CreateBanner(params CreateUpdateBannerParams) (Banner, err
 		return response.Data, err
 	}
 
-	err = ValidateBannerParams(params)
+	err = validateBannerParams(params)
 	if err != nil {
 		return response.Data, err
 	}
@@ -136,6 +136,47 @@ func (client *Client) CreateBanner(params CreateUpdateBannerParams) (Banner, err
 		return response.Data, err
 	}
 
+	return response.Data, nil
+}
+
+func (client *Client) UpdateClient(bannerID int, params CreateUpdateBannerParams) (Banner, error) {
+	type ResponseObject struct {
+		Data Banner   `json:"data"`
+		Meta MetaData `json:"meta"`
+	}
+	var response ResponseObject
+	err := client.Version2Required()
+	if err != nil {
+		return response.Data, err
+	}
+
+	err = validateBannerParams(params)
+	if err != nil {
+		return response.Data, err
+	}
+
+	paramBytes, err := json.Marshal(params)
+	if err != nil {
+		return response.Data, err
+	}
+
+	path := client.BaseURL.JoinPath("banners", fmt.Sprint(bannerID)).String()
+
+	resp, err := client.Put(path, paramBytes)
+	if err != nil {
+		return response.Data, err
+	}
+	defer resp.Body.Close()
+
+	err = expectStatusCode(200, resp)
+	if err != nil {
+		return response.Data, err
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&response)
+	if err != nil {
+		return response.Data, err
+	}
 	return response.Data, nil
 }
 
