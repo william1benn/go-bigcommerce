@@ -1,12 +1,11 @@
 package bigcommerce
 
 /*
-	I have this idea where you select a parent product and you select some other existing products and they will be recreated as variants
-	under the selected parent product. All products that became variants will be deleted and redirected
+I have this idea where you select a parent product and you select some other existing products and they will be recreated as variants
+under the selected parent product. All products that became variants will be deleted and redirected
 
-	first port of call is the ability to convert  from a product to a variant
+first port of call is the ability to convert  from a product to a variant
 */
-// TODO I actuall need to convert to a CreateProductVariantParams object...
 func (product *Product) ToVariantCreateParams(parentProductID int) ProductVariantCreateParams {
 	return ProductVariantCreateParams{
 		CostPrice:              product.CostPrice,
@@ -29,8 +28,22 @@ func (product *Product) ToVariantCreateParams(parentProductID int) ProductVarian
 	}
 }
 
-func (product *Product) ToVariantCreateParamsWithOptions(parentProductID int, options []VariantOption) ProductVariantCreateParams {
+func (product *Product) ToVariantCreateParamsWithOptions(parentProductID int, options *[]VariantOption) ProductVariantCreateParams {
 	createVariantParams := product.ToVariantCreateParams(parentProductID)
-	createVariantParams.OptionValues = &options
+	createVariantParams.OptionValues = options
 	return createVariantParams
+}
+
+func (client *Client) ProductToProductVariant(parentProductID int, product Product, options *[]VariantOption) (ProductVariant, error) {
+	var params ProductVariantCreateParams
+	if options != nil {
+		params = product.ToVariantCreateParamsWithOptions(parentProductID, options)
+	} else {
+		params = product.ToVariantCreateParams(parentProductID)
+	}
+	err := client.DeleteProduct(product.ID)
+	if err != nil {
+		return ProductVariant{}, err
+	}
+	return client.CreateProductVariant(parentProductID, params)
 }
