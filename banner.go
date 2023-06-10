@@ -90,13 +90,6 @@ func validateBannerParams(params CreateUpdateBannerParams) error {
 	return nil
 }
 
-func (client *Client) Version2Required() error {
-	if client.Version != "2" {
-		return fmt.Errorf("need to be using version 2 api for this function")
-	}
-	return nil
-}
-
 func (client *Client) CreateBanner(params CreateUpdateBannerParams) (Banner, error) {
 	type ResponseObject struct {
 		Data Banner   `json:"data"`
