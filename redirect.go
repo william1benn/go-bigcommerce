@@ -3,14 +3,14 @@ package bigcommerce
 import "encoding/json"
 
 type Redirect struct {
-	ID       int      `json:"id"`
-	SiteID   int      `json:"site_id"`
-	FromPath string   `json:"from_path"`
-	To       ToObject `json:"to"`
-	ToURL    string   `json:"to_url"`
+	ID       int              `json:"id"`
+	SiteID   int              `json:"site_id"`
+	FromPath string           `json:"from_path"`
+	To       RedirectToObject `json:"to"`
+	ToURL    string           `json:"to_url"`
 }
 
-type ToObject struct {
+type RedirectToObject struct {
 	Type     string `json:"type"`
 	EntityID int    `json:"entity_id"`
 	URL      string `json:"url"`
@@ -56,4 +56,27 @@ type RedirectQueryParams struct {
 	Direction string `url:"direction,omitempty"`
 	Include   string `url:"include,omitempty"`
 	Keyword   string `url:"keyword,omitempty"`
+}
+
+type DeleteRedirectsParams struct {
+	ID     []int `url:"id,omitempty"`
+	SiteID int   `url:"site_id,omitempty"`
+}
+
+func (client *Client) DeleteRedirect(params DeleteRedirectsParams) error {
+	queryParams, err := paramString(params)
+	if err != nil {
+		return err
+	}
+	path := client.BaseURL.JoinPath("/storefront/redirects").String() + queryParams
+	resp, err := client.Delete(path)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	err = expectStatusCode(204, resp)
+	if err != nil {
+		return err
+	}
+	return nil
 }
