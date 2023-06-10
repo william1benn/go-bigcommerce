@@ -160,6 +160,20 @@ func (client *Client) CreateProduct(params CreateUpdateProductParams) (Product, 
 	return response.Data, nil
 }
 
+func (client *Client) DeleteProduct(productID int) error {
+	path := client.BaseURL.JoinPath("/catalog/products", fmt.Sprint(productID)).String()
+	resp, err := client.Delete(path)
+	if err != nil {
+		return err
+	}
+	err = expectStatusCode(204, resp)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (client *Client) RemoveCategoryFromProduct(productID, categoryToRemoveID int) (Product, error) {
 	product, err := client.GetProduct(productID)
 	if err != nil {
