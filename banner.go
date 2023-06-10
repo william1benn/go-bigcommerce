@@ -61,3 +61,31 @@ func (client *Client) GetBanners(params GetBannersParams) ([]Banner, MetaData, e
 
 	return response.Data, response.Meta, nil
 }
+
+func (client *Client) GetBanner(bannerID int) (Banner, error) {
+	type ResponseObject struct {
+		Data Banner   `json:"data"`
+		Meta MetaData `json:"meta"`
+	}
+	var response ResponseObject
+
+	path := client.BaseURL.JoinPath("banners", fmt.Sprint(bannerID)).String()
+
+	resp, err := client.Get(path)
+	if err != nil {
+		return response.Data, err
+	}
+	defer resp.Body.Close()
+
+	err = expectStatusCode(200, resp)
+	if err != nil {
+		return response.Data, err
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&response)
+	if err != nil {
+		return response.Data, err
+	}
+
+	return response.Data, nil
+}
