@@ -160,6 +160,33 @@ func (client *Client) CreateProduct(params CreateUpdateProductParams) (Product, 
 	return response.Data, nil
 }
 
+func (client *Client) RemoveCategoryFromProduct(productID, categoryToRemoveID int) (Product, error) {
+	product, err := client.GetProduct(productID)
+	if err != nil {
+		return product, err
+	}
+
+	categoriesToKeep := []int{}
+
+	for i := 0; i < len(product.Categories); i++ {
+		categoryID := product.Categories[i]
+		if categoryID != categoryToRemoveID {
+			categoriesToKeep = append(categoriesToKeep, categoryID)
+		}
+	}
+
+	return client.UpdateProduct(productID, CreateUpdateProductParams{Categories: categoriesToKeep})
+}
+
+func (client *Client) AddCategoryToProduct(productID, categoryToAddID int) (Product, error) {
+	product, err := client.GetProduct(productID)
+	if err != nil {
+		return product, err
+	}
+	updatedProductCategories := append(product.Categories, categoryToAddID)
+	return client.UpdateProduct(productID, CreateUpdateProductParams{Categories: updatedProductCategories})
+}
+
 type Product struct {
 	ID                      int       `json:"id"`
 	Name                    string    `json:"name"`
