@@ -80,25 +80,25 @@ type RestrictedTo struct {
 func validateCreateUpdateCoupon(coupon CreateUpdateCouponParams) error {
 	// Validate required fields
 	if coupon.Name == "" {
-		return errors.New("Name is required")
+		return errors.New("name is required")
 	}
 	if coupon.Type == "" {
-		return errors.New("Type is required")
+		return errors.New("type is required")
 	}
 	if coupon.Amount == "" {
-		return errors.New("Amount is required")
+		return errors.New("amount is required")
 	}
 	if coupon.Enabled && coupon.Code == "" {
-		return errors.New("Code is required when the coupon is enabled")
+		return errors.New("code is required when the coupon is enabled")
 	}
 	if len(coupon.AppliesTo.IDs) == 0 {
-		return errors.New("At least one ID is required in AppliesTo")
+		return errors.New("at least one ID is required in AppliesTo")
 	}
 	if coupon.MaxUses < 0 {
-		return errors.New("MaxUses must be a non-negative value")
+		return errors.New("maxUses must be a non-negative value")
 	}
 	if coupon.MaxUsesPerCustomer < 0 {
-		return errors.New("MaxUsesPerCustomer must be a non-negative value")
+		return errors.New("maxUsesPerCustomer must be a non-negative value")
 	}
 
 	// Additional validation logic for specific fields
