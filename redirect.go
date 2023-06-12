@@ -1,16 +1,19 @@
 package bigcommerce
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"errors"
+)
 
 type Redirect struct {
-	ID       int      `json:"id"`
-	SiteID   int      `json:"site_id"`
-	FromPath string   `json:"from_path"`
-	To       ToObject `json:"to"`
-	ToURL    string   `json:"to_url"`
+	ID       int              `json:"id"`
+	SiteID   int              `json:"site_id"`
+	FromPath string           `json:"from_path"`
+	To       RedirectToObject `json:"to"`
+	ToURL    string           `json:"to_url"`
 }
 
-type ToObject struct {
+type RedirectToObject struct {
 	Type     string `json:"type"`
 	EntityID int    `json:"entity_id"`
 	URL      string `json:"url"`
@@ -56,4 +59,108 @@ type RedirectQueryParams struct {
 	Direction string `url:"direction,omitempty"`
 	Include   string `url:"include,omitempty"`
 	Keyword   string `url:"keyword,omitempty"`
+}
+
+func validateRedirectUpsert(redirect RedirectUpsert) error {
+	if redirect.FromPath == "" {
+		return errors.New("from_path is required")
+	}
+
+	if redirect.SiteID <= 0 {
+		return errors.New("site_id must be a positive integer")
+	}
+
+	if redirect.To.Type == "" {
+		return errors.New("to.type is required")
+	}
+
+	if redirect.To.Type != "product" && redirect.To.Type != "brand" && redirect.To.Type != "category" &&
+		redirect.To.Type != "page" && redirect.To.Type != "post" && redirect.To.Type != "url" {
+		return errors.New("to.type has an invalid value")
+	}
+
+	if redirect.To.Type != "url" && redirect.To.EntityID <= 0 {
+		return errors.New("to.entity_id must be a positive integer")
+	}
+
+	if redirect.To.Type == "url" && len(redirect.To.URL) > 2048 {
+		return errors.New("to.url must be 2048 characters or less")
+	}
+
+	return nil
+}
+
+type RedirectUpsert struct {
+	FromPath string         `json:"from_path"`
+	SiteID   int            `json:"site_id"`
+	To       RedirectTarget `json:"to"`
+}
+
+type RedirectTarget struct {
+	Type     string `json:"type"`
+	EntityID int    `json:"entity_id"`
+	URL      string `json:"url"`
+}
+
+func (client *Client) UpsertRedirects(redirects []RedirectUpsert) ([]Redirect, error) {
+	type ResponseObject struct {
+		Data []Redirect `json:"data"`
+		Meta MetaData   `json:"meta"`
+	}
+	var response ResponseObject
+
+	for i := 0; i < len(redirects); i++ {
+		err := validateRedirectUpsert(redirects[i])
+		if err != nil {
+			return response.Data, err
+		}
+	}
+
+	paramBytes, err := json.Marshal(redirects)
+	if err != nil {
+		return response.Data, err
+	}
+
+	path := client.BaseURL.JoinPath("/storefront/redirects").String()
+
+	resp, err := client.Put(path, paramBytes)
+	if err != nil {
+		return response.Data, err
+	}
+	defer resp.Body.Close()
+
+	err = expectStatusCode(201, resp)
+	if err != nil {
+		return response.Data, err
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&response)
+	if err != nil {
+		return response.Data, err
+	}
+
+	return response.Data, nil
+}
+
+type DeleteRedirectsParams struct {
+	ID     []int `url:"id,omitempty"`
+	SiteID int   `url:"site_id,omitempty"`
+}
+
+func (client *Client) DeleteRedirect(params DeleteRedirectsParams) error {
+	queryParams, err := paramString(params)
+	if err != nil {
+		return err
+	}
+	path := client.BaseURL.JoinPath("/storefront/redirects").String() + queryParams
+	resp, err := client.Delete(path)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	err = expectStatusCode(204, resp)
+	if err != nil {
+		return err
+	}
+	return nil
 }
