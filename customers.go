@@ -36,7 +36,7 @@ type BcAmount struct {
 	Amount float64 `json:"amount,omitempty"`
 }
 
-type BcCustomer []struct {
+type BcCustomer struct {
 	Email                                   string           `json:"email"`
 	FirstName                               string           `json:"first_name"`
 	LastName                                string           `json:"last_name"`
@@ -56,7 +56,7 @@ type BcCustomer []struct {
 }
 
 // /stores/{store_hash}/v3/customers
-func (client *Client) CreateCustomer(params BcCustomer) (BcCustomer, error) {
+func (client *Client) CreateCustomer(params []BcCustomer) (BcCustomer, error) {
 	type ResponseObject struct {
 		Data BcCustomer `json:"data"`
 		Meta MetaData   `json:"meta"`
