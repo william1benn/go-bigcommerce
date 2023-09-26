@@ -1,11 +1,20 @@
 This library provides an unofficial Go client for the bigcommerce REST API
 
+
+> This is a forked repository, that is maintained by me, since the original developer has not merged submitted PR's
+To you this repository for the added features you will need to use _replace_ directive in you go mod file. 
+> look at the docs if you are unfamiliar: https://github.com/golang/go/wiki/Modules#when-should-i-use-the-replace-directive 
+
+
+
+
 ### Installation:
 ```
 go get github.com/seanomeara96/go-bigcommerce
 ```
 
 ### bigcommerce example usage:
+
 
 ```go
 package main
