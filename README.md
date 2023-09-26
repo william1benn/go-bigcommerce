@@ -5,7 +5,6 @@ This library provides an unofficial Go client for the bigcommerce REST API
 go get github.com/seanomeara96/go-bigcommerce
 ```
 
-
 ### bigcommerce example usage:
 
 ```go
