@@ -56,7 +56,7 @@ type BcCustomer []struct {
 }
 
 // /stores/{store_hash}/v3/customers
-func (client *Client) createCustomer(params BcCustomer) (BcCustomer, error) {
+func (client *Client) CreateCustomer(params BcCustomer) (BcCustomer, error) {
 	type ResponseObject struct {
 		Data BcCustomer `json:"data"`
 		Meta MetaData   `json:"meta"`
