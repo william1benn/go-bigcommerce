@@ -27,9 +27,18 @@ type BcAddresses struct {
 	FormFields      []BcFormFields `json:"form_fields,omitempty"`
 }
 
-type BcFormFields []struct {
+type BcFormFields struct {
 	Name  string `json:"name,omitempty"`
 	Value string `json:"value,omitempty"`
+}
+
+type BcAttributes struct {
+	Id             int    `json:"id,omitempty"`
+	CustomerId     int    `json:"customer_id,omitempty"`
+	AttributeId    int    `json:"attribute_id,omitempty"`
+	AttributeValue string `json:"attribute_value,omitempty"`
+	DateCreated    string `json:"date_created,omitempty"`
+	DateModified   string `json:"date_modified,omitempty"`
 }
 
 type BcAmount struct {
@@ -52,6 +61,7 @@ type BcCustomer struct {
 	OriginChannelID                         int              `json:"origin_channel_id,omitempty"`
 	ChannelIds                              []int            `json:"channel_ids,omitempty"`
 	FormFields                              []BcFormFields   `json:"form_fields,omitempty"`
+	Attributes                              []BcAttributes   `json:"attributes,omitempty"`
 	Meta                                    MetaData         `json:"meta,omitempty"`
 }
 
