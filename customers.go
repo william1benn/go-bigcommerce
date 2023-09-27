@@ -55,7 +55,26 @@ type BcCustomer struct {
 	Meta                                    MetaData         `json:"meta,omitempty"`
 }
 
-// /stores/{store_hash}/v3/customers
+type BcCustomerParams struct {
+	IDIn            []int    `url:"id:in,omitempty,comma"`
+	CompanyIn       []string `url:"company:in,omitempty,comma"`
+	IDGreater       []int    `url:"id:greater,omitempty,comma"`
+	NameIn          []string `url:"name:in,omitempty,comma"`
+	EmailIn         []string `url:"email:in,omitempty,comma"`
+	NameLike        []string `url:"name:like,omitempty"`
+	Include         string   `url:"include,omitempty"`
+	Page            int      `url:"page,omitempty"`
+	Limit           int      `url:"limit,omitempty"`
+	Sort            string   `url:"sort,omitempty"`
+	CategoriesIn    []int    `url:"categories:in,omitempty,comma"`
+	CustomerGroupIn []string `url:"customer_group_id:in,omitempty,comma"`
+	DateCreated     string   `url:"date_created,omitempty,comma"`
+	DateCreatedMin  string   `url:"date_created:max,omitempty,comma"`
+	DateCreatedMax  string   `url:"date_created:min,omitempty,comma"`
+	DateModified    string   `url:"date_modified,omitempty,comma"`
+}
+
+// GET /stores/{store_hash}/v3/customers
 func (client *Client) CreateCustomer(params []BcCustomer) ([]BcCustomer, error) {
 	type ResponseObject struct {
 		Data []BcCustomer `json:"data"`
@@ -86,5 +105,34 @@ func (client *Client) CreateCustomer(params []BcCustomer) ([]BcCustomer, error) 
 	if err != nil {
 		return CustomerResponse.Data, err
 	}
+	return CustomerResponse.Data, nil
+}
+
+// GET /stores/{store_hash}/v3/customers
+func (client *Client) GetCustomers(queryParams BcCustomerParams) ([]BcCustomer, error) {
+	type ResponseObject struct {
+		Data []BcCustomer `json:"data"`
+		Meta MetaData     `json:"meta"`
+	}
+	var CustomerResponse ResponseObject
+
+	params, err := paramString(queryParams)
+	if err != nil {
+		return CustomerResponse.Data, fmt.Errorf(err.Error())
+	}
+
+	getCustomers := client.BaseURL.JoinPath("customers").String() + params
+
+	resp, _ := client.Get(getCustomers)
+	err = expectStatusCode(200, resp)
+	if err != nil {
+		return CustomerResponse.Data, fmt.Errorf(err.Error())
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&CustomerResponse)
+	if err != nil {
+		return CustomerResponse.Data, fmt.Errorf(err.Error())
+	}
+
 	return CustomerResponse.Data, nil
 }
