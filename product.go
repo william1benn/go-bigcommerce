@@ -270,6 +270,7 @@ type Product struct {
 	OpenGraphUseProductName bool                 `json:"open_graph_use_product_name"`
 	OpenGraphUseImage       bool                 `json:"open_graph_use_image"`
 	CustomFields            []ProductCustomField `json:"custom_fields,omitempty"`
+	PrimaryImage            ProductImage         `json:"primary_image,omitempty"`
 }
 
 type ProductQueryParams struct {
