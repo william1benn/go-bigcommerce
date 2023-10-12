@@ -31,39 +31,37 @@ func (client *Client) GetOrder(orderID int) (Order, error) {
 	return response.Data, nil
 }
 
-func (client *Client) GetOrders(params OrderQueryParams) ([]Order, MetaData, error) {
+func (client *Client) GetOrders(params OrderQueryParams) ([]Order, error) {
 	type ResponseData struct {
-		Data []Order  `json:"data"`
-		Meta MetaData `json:"meta"`
+		Data []Order
 	}
 	var response ResponseData
 
 	if client.Version != "2" {
-		return response.Data, response.Meta, fmt.Errorf("API version 2 is required for this function. You are using version: %s", client.Version)
+		return response.Data, fmt.Errorf("API version 2 is required for this function. You are using version: %s", client.Version)
 	}
 
 	queryParams, err := paramString(params)
 	if err != nil {
-		return response.Data, response.Meta, err
+		return response.Data, err
 	}
 
 	getOrdersURL := client.BaseURL.JoinPath("/orders").String() + queryParams
 
 	resp, err := client.Get(getOrdersURL)
 	if err != nil {
-		return response.Data, response.Meta, err
+		return response.Data, err
 	}
 	defer resp.Body.Close()
 
 	if err = expectStatusCode(200, resp); err != nil {
-		return response.Data, response.Meta, err
+		return response.Data, err
 	}
 
-	if err = json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		return response.Data, response.Meta, err
+	if err = json.NewDecoder(resp.Body).Decode(&response.Data); err != nil {
+		return response.Data, err
 	}
-
-	return response.Data, response.Meta, nil
+	return response.Data, nil
 }
 
 type Order struct {
