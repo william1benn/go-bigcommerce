@@ -146,10 +146,10 @@ type BillingAddress struct {
 	Street2     string       `json:"street_2"`
 	City        string       `json:"city"`
 	State       string       `json:"state"`
-	Zip         int          `json:"zip"`
+	Zip         string       `json:"zip"`
 	Country     string       `json:"country"`
 	CountryISO2 string       `json:"country_iso2"`
-	Phone       int          `json:"phone"`
+	Phone       string       `json:"phone"`
 	Email       string       `json:"email"`
 	FormFields  []FormFields `json:"form_fields"`
 }
