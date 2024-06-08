@@ -8,13 +8,12 @@ import (
 
 type TokenInput struct {
 	AllowedCorsOrigins []string `json:"allowed_cors_origins"`
-	ChannelId          *int     `json:"channel_id"`
-	ExpiresAt          *int64   `json:"expires_at"`
+	ChannelId          int      `json:"channel_id"`
+	ExpiresAt          int64    `json:"expires_at"`
 }
 
 type StoreTokenResponse struct {
-	Data Token    `json:"data"`
-	Meta MetaData `json:"meta"`
+	Data Token `json:"data"`
 }
 
 type Token struct {
@@ -26,10 +25,10 @@ type Token struct {
 POST stores/{store_hash}/v3/storefront/api-token //
 Expire defaulted to 24 hours and channelId defaulted to 1
 */
-func (client *Client) CreateToken(allowedCorsOrigins []string, channelId *int, Expire *int64) (Token, MetaData, error) {
+func (client *Client) CreateToken(allowedCorsOrigins []string, channelId *int, Expire *int64) (Token, error) {
 	response := StoreTokenResponse{}
 	if len(allowedCorsOrigins) > 2 || len(allowedCorsOrigins) == 0 {
-		return response.Data, response.Meta, errors.New("you cannot have more than two urls or zero urls for allowed cors - required")
+		return response.Data, errors.New("you cannot have more than two urls or zero urls for allowed cors - required")
 	}
 	if Expire == nil {
 		timeAdded := time.Now().Add(time.Hour * 24).Unix()
@@ -40,31 +39,32 @@ func (client *Client) CreateToken(allowedCorsOrigins []string, channelId *int, E
 		channelId = &channelNum
 	}
 
-	tokenInput := &TokenInput{
+	tokenIn := TokenInput{
 		AllowedCorsOrigins: allowedCorsOrigins,
-		ExpiresAt:          Expire,
-		ChannelId:          channelId,
+		ExpiresAt:          *Expire,
+		ChannelId:          *channelId,
+	}
+
+	tokenMarshal, err := json.Marshal(tokenIn)
+	if err != nil {
+		return response.Data, err
 	}
 
 	path := client.BaseURL.JoinPath("/storefront/api-token").String()
-	tokenMarshal, err := json.Marshal(tokenInput)
-	if err != nil {
-		return response.Data, response.Meta, err
-	}
-
 	resp, _ := client.Post(path, tokenMarshal)
 	if err != nil {
-		return response.Data, response.Meta, err
+		return response.Data, err
 	}
 
 	err = expectStatusCode(200, resp)
 	if err != nil {
-		return response.Data, response.Meta, err
+		return response.Data, err
 	}
 
 	err = json.NewDecoder(resp.Body).Decode(&response)
 	if err != nil {
-		return response.Data, response.Meta, err
+		return response.Data, err
 	}
-	return response.Data, response.Meta, nil
+
+	return response.Data, nil
 }
