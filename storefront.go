@@ -21,7 +21,11 @@ type Token struct {
 	JwtToken string `json:"token"`
 }
 
-// POST stores/{store_hash}/v3/storefront/api-token
+// CreateToken
+/*
+POST stores/{store_hash}/v3/storefront/api-token //
+Expire defaulted to 24 hours and channelId defaulted to 1
+*/
 func (client *Client) CreateToken(allowedCorsOrigins []string, channelId *int, Expire *int64) (Token, MetaData, error) {
 	response := StoreTokenResponse{}
 	if len(allowedCorsOrigins) > 2 || len(allowedCorsOrigins) == 0 {
