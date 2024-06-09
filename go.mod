@@ -1,4 +1,4 @@
-module github.com/seanomeara96/go-bigcommerce
+module github.com/william1benn/go-bigcommerce
 
 go 1.19
 
